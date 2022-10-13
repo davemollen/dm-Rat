@@ -115,11 +115,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "dm_graindelay"
+name = "dm_repeat"
 version = "0.1.0"
 dependencies = [
- "grain_delay",
  "lv2",
+ "repeat",
 ]
 
 [[package]]
@@ -151,13 +151,6 @@ name = "glob"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b919933a397b79c37e33b77bb2aa3dc8eb6e165ad809e58ff75bc7db2e34574"
-
-[[package]]
-name = "grain_delay"
-version = "0.1.0"
-dependencies = [
- "rand",
-]
 
 [[package]]
 name = "hermit-abi"
@@ -412,6 +405,13 @@ name = "regex-syntax"
 version = "0.6.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7fe5bd57d1d7414c6b5ed48563a2c855d995ff777729dcd91c369ec7fea395ae"
+
+[[package]]
+name = "repeat"
+version = "0.1.0"
+dependencies = [
+ "rand",
+]
 
 [[package]]
 name = "rustc-hash"

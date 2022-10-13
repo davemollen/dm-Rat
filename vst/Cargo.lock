@@ -27,10 +27,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "dm_graindelay"
+name = "dm_repeat"
 version = "0.1.0"
 dependencies = [
- "grain_delay",
+ "repeat",
  "vst",
 ]
 
@@ -43,13 +43,6 @@ dependencies = [
  "cfg-if",
  "libc",
  "wasi",
-]
-
-[[package]]
-name = "grain_delay"
-version = "0.1.0"
-dependencies = [
- "rand",
 ]
 
 [[package]]
@@ -130,6 +123,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d51e9f596de227fda2ea6c84607f5558e196eeaf43c986b724ba4fb8fdf497e7"
 dependencies = [
  "rand_core",
+]
+
+[[package]]
+name = "repeat"
+version = "0.1.0"
+dependencies = [
+ "rand",
 ]
 
 [[package]]

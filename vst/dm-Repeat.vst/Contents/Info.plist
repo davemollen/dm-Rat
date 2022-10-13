@@ -6,7 +6,7 @@
     <string>English</string>
 
     <key>CFBundleExecutable</key>
-    <string>dm-GrainDelay</string>
+    <string>dm-Repeat</string>
 
     <key>CFBundleGetInfoString</key>
     <string>vst</string>
@@ -15,13 +15,13 @@
     <string></string>
 
     <key>CFBundleIdentifier</key>
-    <string>com.rust-vst.dm-GrainDelay</string>
+    <string>com.rust-vst.dm-Repeat</string>
 
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
 
     <key>CFBundleName</key>
-    <string>dm-GrainDelay</string>
+    <string>dm-Repeat</string>
 
     <key>CFBundlePackageType</key>
     <string>BNDL</string>
@@ -30,7 +30,7 @@
     <string>1.0</string>
 
     <key>CFBundleSignature</key>
-    <string>2982</string>
+    <string>5332</string>
 
     <key>CSResourcesFileMapped</key>
     <string></string>

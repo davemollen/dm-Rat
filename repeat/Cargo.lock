@@ -20,13 +20,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "grain_delay"
-version = "0.1.0"
-dependencies = [
- "rand",
-]
-
-[[package]]
 name = "libc"
 version = "0.2.108"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -76,6 +69,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d51e9f596de227fda2ea6c84607f5558e196eeaf43c986b724ba4fb8fdf497e7"
 dependencies = [
  "rand_core",
+]
+
+[[package]]
+name = "repeat"
+version = "0.1.0"
+dependencies = [
+ "rand",
 ]
 
 [[package]]
