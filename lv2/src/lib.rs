@@ -1,14 +1,14 @@
-extern crate repeat;
 extern crate lv2;
-use repeat::Repeat;
+extern crate repeat;
 use lv2::prelude::*;
+use repeat::Repeat;
 
 #[derive(PortCollection)]
 struct Ports {
     freq: InputPort<Control>,
     repeats: InputPort<Control>,
     feedback: InputPort<Control>,
-    mix: InputPort<Control>,
+    skew: InputPort<Control>,
     input: InputPort<Audio>,
     output: OutputPort<Audio>,
 }
@@ -39,12 +39,12 @@ impl Plugin for DmRepeat {
         let frequency = *ports.freq;
         let repeats = *ports.repeats;
         let feedback = *ports.feedback * 0.01;
-        let mix = *ports.mix * 0.01;
+        let skew = *ports.skew * 0.01;
 
         for (in_frame, out_frame) in Iterator::zip(ports.input.iter(), ports.output.iter_mut()) {
-            *out_frame = self.repeat.run(
-                *in_frame, frequency, repeats, feedback, mix,
-            );
+            *out_frame = self
+                .repeat
+                .run(*in_frame, frequency, repeats, feedback, skew);
         }
     }
 }

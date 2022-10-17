@@ -1,7 +1,6 @@
-mod delay_line;
-mod repeat;
-mod lowpass;
-mod mix;
 mod clip;
+mod delay_line;
+mod lowpass;
+mod repeat;
 
 pub use self::repeat::Repeat;
