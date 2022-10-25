@@ -24,17 +24,18 @@ impl Repeat {
   }
 
   fn get_delay_time(&self, index: f32, time_in_ms: f32, skew: f32) -> f32 {
-    if skew == 1. {
+    if skew == 0. {
       time_in_ms * index
     } else {
-      f32::powf(skew, index) * time_in_ms
+      let softer_skew = f32::powf(skew, 2.) * skew.signum();
+      f32::powf(softer_skew + 1., index) * time_in_ms
     }
   }
 
   fn repeat(&mut self, freq: f32, repeats: u32, feedback: f32, skew: f32) -> f32 {
     let time_in_ms = 1000. / freq;
     let mut out = 0f32;
-    for i in 1..(repeats - 1) {
+    for i in 1..repeats {
       let index = i as f32;
       let multiplication = self.simulate_feedback(index, feedback);
       let time = self.get_delay_time(index, time_in_ms, skew);
@@ -74,16 +75,16 @@ mod tests {
   #[test]
   fn delay_time() {
     let repeater = Repeat::new(44100.);
-    assert_eq!(repeater.get_delay_time(1.0, 100.0, 1.0), 100.0);
-    assert_eq!(repeater.get_delay_time(2.0, 100.0, 1.0), 200.0);
-    assert_eq!(repeater.get_delay_time(3.0, 100.0, 1.0), 300.0);
+    assert_eq!(repeater.get_delay_time(1.0, 100.0, 0.0), 100.0);
+    assert_eq!(repeater.get_delay_time(2.0, 100.0, 0.0), 200.0);
+    assert_eq!(repeater.get_delay_time(3.0, 100.0, 0.0), 300.0);
 
-    assert_eq!(repeater.get_delay_time(1.0, 100.0, 2.0), 200.0);
-    assert_eq!(repeater.get_delay_time(2.0, 100.0, 2.0), 400.0);
-    assert_eq!(repeater.get_delay_time(3.0, 100.0, 2.0), 800.0);
+    assert_eq!(repeater.get_delay_time(1.0, 100.0, 1.0), 200.0);
+    assert_eq!(repeater.get_delay_time(2.0, 100.0, 1.0), 400.0);
+    assert_eq!(repeater.get_delay_time(3.0, 100.0, 1.0), 800.0);
 
-    assert_eq!(repeater.get_delay_time(1.0, 100.0, 0.5), 50.0);
-    assert_eq!(repeater.get_delay_time(2.0, 100.0, 0.5), 25.0);
-    assert_eq!(repeater.get_delay_time(3.0, 100.0, 0.5), 12.5);
+    assert_eq!(repeater.get_delay_time(1.0, 100.0, -0.5), 75.0);
+    assert_eq!(repeater.get_delay_time(2.0, 100.0, -0.5), 56.25);
+    assert_eq!(repeater.get_delay_time(3.0, 100.0, -0.5), 42.1875);
   }
 }
