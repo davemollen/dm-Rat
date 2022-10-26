@@ -95,7 +95,7 @@ impl PluginParameters for RepeatParameters {
   fn get_parameter(&self, index: i32) -> f32 {
     match index {
       0 => ((self.freq.get() - 0.1) / 49.9).powf(0.333333),
-      1 => ((self.repeats.get() - 1.0) / 31.0),
+      1 => (self.repeats.get() - 1.0) / 31.0,
       2 => self.feedback.get() / 2.5 - 1.25,
       3 => self.skew.get() / 2. + 1.,
       _ => 0.0,
