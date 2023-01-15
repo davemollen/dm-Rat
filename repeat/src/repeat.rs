@@ -6,14 +6,16 @@ pub struct Repeat {
   delay: DelayLine,
   smooth_freq: Lowpass,
   smooth_skew: Lowpass,
+  previous_time: f32,
 }
 
 impl Repeat {
-  pub fn new(sample_rate: f64) -> Self {
+  pub fn new(sample_rate: f32) -> Self {
     Self {
       delay: DelayLine::new(sample_rate as usize * 10, sample_rate),
       smooth_freq: Lowpass::new(sample_rate),
       smooth_skew: Lowpass::new(sample_rate),
+      previous_time: 0.0,
     }
   }
 
@@ -35,27 +37,36 @@ impl Repeat {
     }
   }
 
-  fn get_delay_time(&self, index: f32, time: f32, skew: f32) -> f32 {
-    if skew == 0. {
+  fn get_delay_time(&mut self, index: f32, time: f32, skew: f32) -> f32 {
+    if index == 0. {
+      self.previous_time = 0.0;
+      0.0
+    } else if skew == 0. {
       time * index
     } else {
       let exponential_skew = f32::powf(2.0, skew);
-      if exponential_skew > 1.0 {
-        f32::powf(exponential_skew, index) * time - time
+      let delay_time = if index == 1. {
+        f32::powf(exponential_skew, index - 1.) * time
       } else {
-        (1. - f32::powf(exponential_skew, index - 1.)) * time + time
-      }
+        f32::powf(exponential_skew, index - 1.) * time + self.previous_time
+      };
+      self.previous_time = delay_time;
+      delay_time
     }
   }
 
-  fn repeat(&mut self, freq: f32, repeats: u32, feedback: f32, skew: f32) -> f32 {
+  fn repeat(&mut self, input: f32, freq: f32, repeats: u32, feedback: f32, skew: f32) -> f32 {
     let time_in_ms = 1000. / freq;
     let mut out = 0f32;
     for i in 0..repeats {
       let index = i as f32;
       let multiplication = self.simulate_feedback(index, feedback, repeats);
-      let time = self.get_delay_time(index, time_in_ms, skew);
-      out += self.delay.read(time, "step") * multiplication
+      if i == 0 {
+        out += input * multiplication;
+      } else {
+        let time = self.get_delay_time(index, time_in_ms, skew);
+        out += self.delay.read(time, "step") * multiplication;
+      }
     }
     out
   }
@@ -64,7 +75,13 @@ impl Repeat {
     self.delay.write(input);
     let smoothed_freq = self.smooth_freq.run(freq, 3.);
     let smoothed_skew = self.smooth_skew.run(skew, 3.);
-    let repeated = self.repeat(smoothed_freq, repeats as u32, feedback, smoothed_skew);
+    let repeated = self.repeat(
+      input,
+      smoothed_freq,
+      repeats as u32,
+      feedback,
+      smoothed_skew,
+    );
     repeated
   }
 }
@@ -109,7 +126,7 @@ mod tests {
 
   #[test]
   fn delay_time() {
-    let repeater = Repeat::new(44100.);
+    let mut repeater = Repeat::new(44100.);
     assert_eq!(repeater.get_delay_time(0.0, 100.0, 0.0), 0.0);
     assert_eq!(repeater.get_delay_time(1.0, 100.0, 0.0), 100.0);
     assert_eq!(repeater.get_delay_time(2.0, 100.0, 0.0), 200.0);
@@ -119,6 +136,16 @@ mod tests {
     assert_eq!(repeater.get_delay_time(1.0, 100.0, 1.0), 100.0);
     assert_eq!(repeater.get_delay_time(2.0, 100.0, 1.0), 300.0);
     assert_eq!(repeater.get_delay_time(3.0, 100.0, 1.0), 700.0);
+
+    assert_eq!(repeater.get_delay_time(0.0, 100.0, 0.5), 0.0);
+    assert_eq!(repeater.get_delay_time(1.0, 100.0, 0.5), 100.0);
+    assert_eq!(repeater.get_delay_time(2.0, 100.0, 0.5), 241.42136);
+    assert_eq!(repeater.get_delay_time(3.0, 100.0, 0.5), 441.42133);
+
+    assert_eq!(repeater.get_delay_time(0.0, 100.0, -0.5), 0.0);
+    assert_eq!(repeater.get_delay_time(1.0, 100.0, -0.5), 100.0);
+    assert_eq!(repeater.get_delay_time(2.0, 100.0, -0.5), 170.71068);
+    assert_eq!(repeater.get_delay_time(3.0, 100.0, -0.5), 220.71068);
 
     assert_eq!(repeater.get_delay_time(0.0, 100.0, -1.0), 0.0);
     assert_eq!(repeater.get_delay_time(1.0, 100.0, -1.0), 100.0);

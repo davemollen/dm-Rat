@@ -4,10 +4,8 @@ extern crate vst;
 use repeat::Repeat;
 use std::sync::Arc;
 use vst::{
-  api::TimeInfo,
   buffer::AudioBuffer,
-  host::Host,
-  plugin::{HostCallback, Info, Plugin, PluginParameters},
+  plugin::{Category, Info, Plugin, PluginParameters},
   util::AtomicFloat,
 };
 
@@ -44,29 +42,21 @@ impl Default for DmRepeat {
 }
 
 impl Plugin for DmRepeat {
-  fn new(host: HostCallback) -> Self {
-    fn get_sample_rate(info: TimeInfo) -> f64 {
-      info.sample_rate
-    }
-    let sample_rate = host.get_time_info(0).map(get_sample_rate).unwrap();
-    Self {
-      params: Arc::new(RepeatParameters::default()),
-      repeat: Repeat::new(sample_rate),
-    }
-  }
-
   fn set_sample_rate(&mut self, sample_rate: f32) {
-    self.repeat = Repeat::new(f64::from(sample_rate));
+    self.repeat = Repeat::new(sample_rate);
   }
 
   fn get_info(&self) -> Info {
     Info {
       name: "dm-Repeat".to_string(),
+      vendor: "DM".to_string(),
+      version: 1,
       inputs: 1,
       outputs: 1,
       parameters: 4,
       unique_id: 1357,
       f64_precision: true,
+      category: Category::Effect,
       ..Default::default()
     }
   }
