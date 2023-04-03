@@ -7,6 +7,7 @@ use std::sync::Arc;
 use vst::{
   buffer::AudioBuffer,
   plugin::{Category, Info, Plugin, PluginParameters},
+  prelude::HostCallback,
 };
 
 struct DmRepeat {
@@ -14,16 +15,14 @@ struct DmRepeat {
   repeat: Repeat,
 }
 
-impl Default for DmRepeat {
-  fn default() -> Self {
+impl Plugin for DmRepeat {
+  fn new(_: HostCallback) -> Self {
     Self {
       params: Arc::new(RepeatParameters::default()),
       repeat: Repeat::new(44100.),
     }
   }
-}
 
-impl Plugin for DmRepeat {
   fn set_sample_rate(&mut self, sample_rate: f32) {
     self.repeat = Repeat::new(sample_rate);
   }
@@ -51,9 +50,13 @@ impl Plugin for DmRepeat {
 
     for (input_buffer, output_buffer) in buffer.zip() {
       for (input_sample, output_sample) in input_buffer.iter().zip(output_buffer) {
-        *output_sample = self
-          .repeat
-          .run(*input_sample, freq, repeats, feedback, skew);
+        *output_sample = self.repeat.run(
+          *input_sample,
+          freq,
+          repeats,
+          feedback * 2.5 - 1.25,
+          skew * 2. - 1.,
+        );
       }
     }
   }

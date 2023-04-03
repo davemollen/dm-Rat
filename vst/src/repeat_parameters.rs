@@ -12,8 +12,8 @@ impl Default for RepeatParameters {
     Self {
       freq: AtomicFloat::new(4.0),
       repeats: AtomicFloat::new(4.0),
-      feedback: AtomicFloat::new(1.0),
-      skew: AtomicFloat::new(0.0),
+      feedback: AtomicFloat::new(0.9),
+      skew: AtomicFloat::new(0.5),
     }
   }
 }
@@ -23,8 +23,8 @@ impl PluginParameters for RepeatParameters {
     match index {
       0 => ((self.freq.get() - 0.1) / 49.9).powf(0.333333),
       1 => (self.repeats.get() - 1.0) / 31.0,
-      2 => self.feedback.get() / 2.5 - 1.25,
-      3 => self.skew.get() / 2. + 1.,
+      2 => self.feedback.get(),
+      3 => self.skew.get(),
       _ => 0.0,
     }
   }
@@ -32,9 +32,9 @@ impl PluginParameters for RepeatParameters {
   fn get_parameter_text(&self, index: i32) -> String {
     match index {
       0 => format!("{:.2} hz", self.freq.get()),
-      1 => format!("{:.2}", self.repeats.get()),
-      2 => format!("{:.2}%", self.feedback.get() * 100.0),
-      3 => format!("{:.2}%", self.skew.get() * 100.0),
+      1 => format!("{}", self.repeats.get()),
+      2 => format!("{:.2}%", self.feedback.get() * 250.0 - 125.0),
+      3 => format!("{:.2}%", self.skew.get() * 200.0 - 100.0),
       _ => "".to_string(),
     }
   }
@@ -53,9 +53,9 @@ impl PluginParameters for RepeatParameters {
   fn set_parameter(&self, index: i32, val: f32) {
     match index {
       0 => self.freq.set(val.powf(3.) * 49.9 + 0.1),
-      1 => self.repeats.set(val * 31.0 + 1.0),
-      2 => self.feedback.set(val * 2.5 - 1.25),
-      3 => self.skew.set(val * 2. - 1.),
+      1 => self.repeats.set((val * 31.0 + 1.0).floor()),
+      2 => self.feedback.set(val),
+      3 => self.skew.set(val),
       _ => (),
     }
   }
