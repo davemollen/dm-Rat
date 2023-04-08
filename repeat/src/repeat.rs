@@ -1,6 +1,6 @@
-use crate::delay_line::DelayLine;
-use crate::delay_line_read::DelayLineRead;
-use crate::ramp::Ramp;
+use crate::{
+  delay_line::DelayLine, delay_line_read::DelayLineRead, float_ext::FloatExt, ramp::Ramp,
+};
 use std::f32;
 use std::f32::consts::FRAC_PI_2;
 
@@ -45,7 +45,7 @@ impl Repeat {
     } = self;
 
     let ramp = self.ramp.run(5., 0., 1.);
-    let window = (ramp * FRAC_PI_2).cos();
+    let window = (ramp * FRAC_PI_2).fast_cos();
     let window = window * window;
 
     (0..2)

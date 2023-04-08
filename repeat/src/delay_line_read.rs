@@ -1,5 +1,6 @@
 use crate::{
   delay_line::{DelayLine, Interpolation},
+  float_ext::FloatExt,
   repeat::MAX_REPEATS,
 };
 
@@ -27,7 +28,7 @@ impl DelayLineRead {
     if absolute_feedback == 1. {
       1.
     } else {
-      f32::powf(absolute_feedback, feedback_index)
+      absolute_feedback.fast_pow(feedback_index)
     }
   }
 
@@ -38,11 +39,11 @@ impl DelayLineRead {
     } else if skew == 0. {
       time * index
     } else {
-      let exponential_skew = 2_f32.powf(skew);
+      let exponential_skew = 2_f32.fast_pow(skew);
       let delay_time = if index == 1. {
-        exponential_skew.powf(index - 1.) * time
+        exponential_skew.fast_pow(index - 1.) * time
       } else {
-        exponential_skew.powf(index - 1.) * time + self.previous_time
+        exponential_skew.fast_pow(index - 1.) * time + self.previous_time
       };
       self.previous_time = delay_time;
       delay_time
