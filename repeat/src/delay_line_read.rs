@@ -68,7 +68,7 @@ impl DelayLineRead {
           input * gain
         } else {
           let time = self.get_delay_time(index, time_in_ms, skew);
-          delay_line.read(time, Interpolation::Linear) * gain
+          delay_line.read(time, Interpolation::Step) * gain
         }
       })
       .sum()
