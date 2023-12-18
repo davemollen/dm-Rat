@@ -97,8 +97,8 @@ impl Repeat {
     }
   }
 
-  pub fn run(&mut self, input: f32, freq: f32, repeats: f32, feedback: f32, skew: f32) -> f32 {
-    let repeated = self.repeat(input, freq, repeats as usize, feedback, skew);
+  pub fn run(&mut self, input: f32, freq: f32, repeats: usize, feedback: f32, skew: f32) -> f32 {
+    let repeated = self.repeat(input, freq, repeats, feedback, skew);
     self.delay_line.write(input);
     repeated
   }

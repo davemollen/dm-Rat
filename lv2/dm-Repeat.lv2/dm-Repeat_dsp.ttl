@@ -30,7 +30,7 @@
 		lv2:portProperty lv2:integer ;
 		lv2:default 4.0 ;
 		lv2:minimum 1.0 ;
-		lv2:maximum 32.0 ;
+		lv2:maximum 24.0 ;
 	] , [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 2 ;

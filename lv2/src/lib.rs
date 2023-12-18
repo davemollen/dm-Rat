@@ -44,7 +44,7 @@ impl Plugin for DmRepeat {
     for (in_frame, out_frame) in Iterator::zip(ports.input.iter(), ports.output.iter_mut()) {
       *out_frame = self
         .repeat
-        .run(*in_frame, frequency, repeats, feedback, skew);
+        .run(*in_frame, frequency, repeats as usize, feedback, skew);
     }
   }
 }

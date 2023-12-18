@@ -1,25 +1,35 @@
 #[macro_use]
 extern crate vst;
+mod editor;
+use editor::RepeatEditor;
 mod repeat_parameters;
 use repeat::Repeat;
-use repeat_parameters::RepeatParameters;
+use repeat_parameters::{RepeatParameters, Params};
 use std::sync::Arc;
 use vst::{
   buffer::AudioBuffer,
   plugin::{Category, Info, Plugin, PluginParameters},
-  prelude::HostCallback,
+  prelude::HostCallback, editor::Editor,
 };
 
 struct DmRepeat {
   params: Arc<RepeatParameters>,
   repeat: Repeat,
+  editor: Option<RepeatEditor>,
 }
 
 impl Plugin for DmRepeat {
-  fn new(_: HostCallback) -> Self {
+  fn new(host: HostCallback) -> Self {
+    let params = Arc::new(RepeatParameters::default());
+
     Self {
-      params: Arc::new(RepeatParameters::default()),
+      params: params.clone(),
       repeat: Repeat::new(44100.),
+      editor: Some(RepeatEditor {
+        params: params.clone(),
+        is_open: false,
+        host: Some(host),
+      })
     }
   }
 
@@ -43,19 +53,19 @@ impl Plugin for DmRepeat {
   }
 
   fn process(&mut self, buffer: &mut AudioBuffer<f32>) {
-    let freq = self.params.freq.get();
-    let repeats = self.params.repeats.get();
-    let feedback = self.params.feedback.get();
-    let skew = self.params.skew.get();
+    let freq = self.params.freq.get_value();
+    let repeats = self.params.repeats.get_value();
+    let feedback = self.params.feedback.get_value();
+    let skew = self.params.skew.get_value();
 
     for (input_buffer, output_buffer) in buffer.zip() {
       for (input_sample, output_sample) in input_buffer.iter().zip(output_buffer) {
         *output_sample = self.repeat.run(
           *input_sample,
           freq,
-          repeats,
-          feedback * 2.5 - 1.25,
-          skew * 2. - 1.,
+          repeats as usize,
+          feedback,
+          skew,
         );
       }
     }
@@ -63,6 +73,14 @@ impl Plugin for DmRepeat {
 
   fn get_parameter_object(&mut self) -> Arc<dyn PluginParameters> {
     Arc::clone(&self.params) as Arc<dyn PluginParameters>
+  }
+
+  fn get_editor(&mut self) -> Option<Box<dyn Editor>> {
+    if let Some(editor) = self.editor.take() {
+      Some(Box::new(editor) as Box<dyn Editor>)
+    } else {
+      None
+    }
   }
 }
 
