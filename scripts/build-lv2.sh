@@ -1,11 +1,11 @@
-PACKAGE_NAME=(`./scripts/get-package-name.sh vst`)
+PACKAGE_NAME=(`./scripts/get-package-name.sh lv2`)
 NAME=$(echo $PACKAGE_NAME | perl -pe 's/dm_+([^\W_])/dm-\U$1/g' | perl -pe 's/(?<=[^\W_])_+([^\W_])/\U$1/g')
-VST_NAME="$NAME.dylib"
-BINARY_NAME="lib$PACKAGE_NAME.dylib"
+LV2_NAME="$NAME.so"
+BINARY_NAME="lib$PACKAGE_NAME.so"
 MOVE_FROM="target/release/$BINARY_NAME"
-MOVE_TO="target/release/$VST_NAME"
+MOVE_TO="target/release/$LV2_NAME"
 
-cd vst
+cd lv2
 cargo build --release
 
 if [ -d "$MOVE_TO" ]; then
@@ -13,5 +13,5 @@ if [ -d "$MOVE_TO" ]; then
 fi
 
 if mv "$MOVE_FROM" "$MOVE_TO"; then
-  echo "Finished compiling VST plugin. File can be found here: '$MOVE_TO'."
+  echo "Finished compiling LV2 plugin. File can be found here: '$MOVE_TO'."
 fi

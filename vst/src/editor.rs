@@ -1,7 +1,7 @@
 mod ui;
+pub use ui::plugin_gui;
 use crate::RepeatParameters;
 use std::sync::Arc;
-pub use ui::plugin_gui;
 use vizia::{prelude::WindowSize, Application, ParentWindow};
 use vst::{editor::Editor, prelude::HostCallback};
 

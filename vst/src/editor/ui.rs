@@ -1,9 +1,12 @@
-#[path="./ui/components/param_knob.rs"]
+#[path="./components/param_knob.rs"]
 mod param_knob;
 use param_knob::ParamKnob;
-#[path="./ui/components/param_int_knob.rs"]
+#[path="./components/param_int_knob.rs"]
 mod param_int_knob;
 use param_int_knob::ParamIntKnob;
+#[path="ui_data.rs"]
+mod ui_data;
+use ui_data::{UiData, ParamChangeEvent};
 use vizia::{
   views::{VStack, HStack, Label}, 
   context::Context, 
@@ -14,10 +17,8 @@ use vizia::{
 use crate::repeat_parameters::RepeatParameters;
 use std::sync::Arc;
 use vst::prelude::HostCallback;
-mod ui_data;
-pub use ui_data::{ParamChangeEvent, UiData};
 
-const STYLE: &str = include_str!("./ui/style.css");
+const STYLE: &str = include_str!("./style.css");
 
 pub fn plugin_gui(cx: &mut Context, params: Arc<RepeatParameters>, host: Option<HostCallback>) {
   cx.add_theme(STYLE);
