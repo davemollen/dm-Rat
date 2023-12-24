@@ -18,7 +18,7 @@ use crate::repeat_parameters::RepeatParameters;
 use std::sync::Arc;
 use vst::prelude::HostCallback;
 
-const STYLE: &str = include_str!("./style.css");
+const STYLE: &str = include_str!("style.css");
 
 pub fn plugin_gui(cx: &mut Context, params: Arc<RepeatParameters>, host: Option<HostCallback>) {
   cx.add_theme(STYLE);

@@ -112,7 +112,10 @@ impl ClapPlugin for DmRepeat {
 
 impl Vst3Plugin for DmRepeat {
   const VST3_CLASS_ID: [u8; 16] = *b"dm-Repeat.......";
-  const VST3_SUBCATEGORIES: &'static [Vst3SubCategory] = &[Vst3SubCategory::Fx, Vst3SubCategory::Delay];
+  const VST3_SUBCATEGORIES: &'static [Vst3SubCategory] = &[
+    Vst3SubCategory::Fx, 
+    Vst3SubCategory::Delay
+  ];
 }
 
 nih_export_clap!(DmRepeat);
