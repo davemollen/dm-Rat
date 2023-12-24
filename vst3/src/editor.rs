@@ -5,7 +5,7 @@ use nih_plug::params::Param;
 mod ui_data;
 use ui_data::{UiData, ParamChangeEvent};
 use nih_plug::prelude::Editor;
-use nih_plug_vizia::{ViziaState, ViziaTheming, create_vizia_editor, widgets::ResizeHandle};
+use nih_plug_vizia::{ViziaState, ViziaTheming, create_vizia_editor};
 use nih_plug_vizia::vizia::{
   views::{VStack, HStack, Label}, 
   prelude::{Weight, Units::{Stretch, Pixels}, LayoutType}, 
@@ -32,8 +32,6 @@ pub(crate) fn create(
         params: params.clone(),
         gui_context: gui_context.clone()
       }.build(cx);
-
-      ResizeHandle::new(cx);
 
       VStack::new(cx, |cx| {
         HStack::new(cx, |cx| {
