@@ -67,7 +67,7 @@ pub fn plugin_gui(cx: &mut Context, params: Arc<RepeatParameters>, host: Option<
       .font_size(22.0)
       .font_weight(Weight::BOLD)
       .border_radius(Pixels(16.0))
-      .border_width(Pixels(2.))
+      .border_width(Pixels(1.))
       .border_color("#005254")
       .background_color("#009092")
       .child_space(Stretch(1.0))
