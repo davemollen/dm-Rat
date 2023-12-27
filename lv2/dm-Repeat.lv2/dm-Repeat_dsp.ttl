@@ -17,7 +17,7 @@
 		lv2:index 0 ;
 		lv2:symbol "freq" ;
 		lv2:name "Freq" ;
-		lv2:portProperty epp:logarithmic ;
+		lv2:portProperty epp:logarithmic , mod:tempoRelatedDynamicScalePoints ;
 		lv2:default 4.0 ;
 		lv2:minimum 0.1 ;
 		lv2:maximum 50.0 ;
