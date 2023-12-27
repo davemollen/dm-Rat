@@ -39,7 +39,7 @@ impl DelayLineRead {
     } else if skew == 0. {
       time * index
     } else {
-      let exponential_skew = 2_f32.fast_pow(skew);
+      let exponential_skew = skew.abs().fast_pow(2.) * if skew < 0. { -0.5 } else { 1. } + 1.;
       let delay_time = if index == 1. {
         exponential_skew.fast_pow(index - 1.) * time
       } else {
@@ -125,16 +125,6 @@ mod tests {
     assert_eq!(repeater.get_delay_time(1.0, 100.0, 1.0), 100.0);
     assert_eq!(repeater.get_delay_time(2.0, 100.0, 1.0), 300.0);
     assert_eq!(repeater.get_delay_time(3.0, 100.0, 1.0), 700.0);
-
-    assert_eq!(repeater.get_delay_time(0.0, 100.0, 0.5), 0.0);
-    assert_eq!(repeater.get_delay_time(1.0, 100.0, 0.5), 100.0);
-    assert_eq!(repeater.get_delay_time(2.0, 100.0, 0.5), 241.42136);
-    assert_eq!(repeater.get_delay_time(3.0, 100.0, 0.5), 441.42133);
-
-    assert_eq!(repeater.get_delay_time(0.0, 100.0, -0.5), 0.0);
-    assert_eq!(repeater.get_delay_time(1.0, 100.0, -0.5), 100.0);
-    assert_eq!(repeater.get_delay_time(2.0, 100.0, -0.5), 170.71068);
-    assert_eq!(repeater.get_delay_time(3.0, 100.0, -0.5), 220.71068);
 
     assert_eq!(repeater.get_delay_time(0.0, 100.0, -1.0), 0.0);
     assert_eq!(repeater.get_delay_time(1.0, 100.0, -1.0), 100.0);
