@@ -1,48 +1,51 @@
 ## dm-Repeat
 
-A delay effect with a fixed number of repeats written in Rust.
-The effect can be compiled to a [lv2](./lv2) or [vst](./vst) plugin.
-This plugin has been written primarily to run on [Mod devices](https://moddevices.com/). And because I mainly use this for guitar it's just mono for now.
+A delay effect with a fixed number of repeats written in Rust. 
+The effect can be compiled to a [Mod devices](https://moddevices.com/), lv2, vst3, CLAP or vst plugin.
 
 ## Table of contents:
 
 - [Mod devices installation](#Mod-devices-installation)
-- [LV2 installation](#LV2-installation)
-- [VST installation](#VST-installation)
+- [Other plugin format installation](#Other-plugin-format-installation)
+  - [LV2 installation](#LV2-installation)
+  - [VST3 installation](#VST3-installation)
+  - [CLAP installation](#CLAP-installation)
+  - [VST installation](#VST-installation)
 
 ## Mod devices installation
 
 You can find the plugin for the Mod Dwarf [here](./lv2/dm-Repeat.lv2/).
 
-For Mod Duo, follow the [lv2 instructions](#LV2-installation) first. Then finish the instructions below.
+To build the plugin for your MOD device see [these instructions](https://github.com/moddevices/mod-plugin-builder).
 
-- Copy the .lv2 folder into your Mod:
+## Other plugin format installation
+A prerequisite to install any plugin is to have Rust installed on your machine.
+Follow [these instructions](https://www.rust-lang.org/tools/install) to install Rust.
 
-  ```
-  scp -rp <path to dm-Repeat.lv2> root@192.168.51.1:/root/.lv2
-  ```
+Below you can find the additional instructions per plugin format. These instructions might not be complete. Please let me know if anything's missing.
 
-- Enter Mod password
-- Reboot Mod
+### LV2 installation
+Go into the lv2 directory and run the `cargo build --release` command.
+Once finished, copy the compiled plugin from [/target/release](./lv2/target/release) into your plugin folder.
 
-## LV2 installation
+### VST3 installation
+If you want to compile the vst3 plugin for mac you should run `./scripts/build-vst3-for-mac.sh`. This will compile and copy the plugin to the default plugin folder.
 
-In order to build the binaries you need to have Docker installed. If so, proceed with the following steps:
+If you want to compile the vst3 plugin on other systems you should go into the nih-plug directory and run `cargo xtask bundle dm_repeat --release`.
+Once finished, copy the compiled plugin from [/target/bundled](./nih-plug/target/bundled) into your plugin folder.
 
-- Run `./build-lv2.sh` in the root directory.
-- Copy/paste the binary of the target platform from the `./lv2/out` directory into `./lv2/dm-Repeat.lv2`
+### CLAP installation
+If you want to compile the CLAP plugin you should go into the nih-plug directory and run `cargo xtask bundle dm_repeat --release`.
+Once finished, copy the compiled plugin from [/target/bundled](./nih-plug/target/bundled) into your plugin folder.
 
-## VST installation
+### VST installation
+The following scripts can be used to compile the plugin for mac. Prefix the command with `sudo ` if you get a `Permission denied` error.
+- For intel macs:
 
-First go to the [vst folder](./vst).
+  Running the `./scripts/build-vst-for-mac.sh` command will compile and copy the plugin to the default plugin folder.
+- For M1 macs:
 
-Windows:
+  Running the `./scripts/build-vst-for-mac-m1.sh` command will compile and copy the plugin to the default plugin folder.
 
-1. Run `cargo build --release`
-2. Copy libdm_repeat.dll in /target/release to your vst plugin folder
-
-Mac
-
-1. Run `cargo build --release`
-2. Run `./osx_vst_bundler.sh dm-Repeat target/release/libdm_repeat.dylib`
-3. Copy dm-Repeat.vst in the root of this folder to your vst plugin folder
+If you want to compile the vst plugin on other systems you should go into the vst directory and run `cargo build --release`.
+Once finished, copy the compiled plugin from [/target/release](./vst/target/release) into your plugin folder.
