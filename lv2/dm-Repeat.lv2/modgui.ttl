@@ -8,7 +8,7 @@
         modgui:stylesheet <modgui/stylesheet-dm-repeat.css> ;
         modgui:screenshot <modgui/screenshot-dm-repeat.png> ;
         modgui:thumbnail <modgui/thumbnail-dm-repeat.png> ;
-        modgui:brand "dm" ;
+        modgui:brand "DM" ;
         modgui:label "Repeat" ;
         modgui:model "boxy" ;
         modgui:panel "4-knobs" ;
