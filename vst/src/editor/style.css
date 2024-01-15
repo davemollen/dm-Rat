@@ -32,3 +32,7 @@ textbox:hover {
   border-width: 0px;
   outline-color: none;
 }
+
+textbox:checked.caret {
+  caret-color: #E1D9D1;
+}
