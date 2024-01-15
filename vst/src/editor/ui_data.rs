@@ -1,7 +1,7 @@
 use crate::repeat_parameters::{Params, RepeatParameters};
 use std::sync::Arc;
 use vizia::{
-  prelude::{Lens, Wrapper, Event, EventContext}, state::Model
+  prelude::{Lens, Wrapper, Event, EventContext}, model::Model
 };
 use vst::{host::Host, prelude::HostCallback};
 

@@ -8,8 +8,13 @@ knob {
   height: 40px;
 }
 
-knob .track {
-  background-color: #00a5a7;
+knob .knob-track {
+  color: #00a5a7;
+  background-color: #363636;
+}
+
+knob .knob-head {
+  display: none;
 }
 
 textbox {
@@ -19,18 +24,11 @@ textbox {
   background-color: transparent;
   border-width: 0px;
   outline-color: none;
+  child-space: 1s;
 }
 
 textbox:hover {
   background-color: transparent;
   border-width: 0px;
   outline-color: none;
-}
-
-.hide {
-  display: none;
-}
-
-label.align_center {
-  text-align: center;
 }

@@ -1,12 +1,7 @@
 use crate::repeat_parameters::RepeatParameters;
 use nih_plug::{prelude::GuiContext, params::internals::ParamPtr};
-use nih_plug_vizia::vizia::{
-  prelude::{Lens, Wrapper, Event}, 
-  context::EventContext, 
-  state::Model
-};
+use nih_plug_vizia::vizia::prelude::*;
 use std::sync::Arc;
-
 pub enum ParamChangeEvent {
   SetParam(ParamPtr, f32),
 }

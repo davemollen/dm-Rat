@@ -1,18 +1,18 @@
 #[path="./components/param_knob.rs"]
 mod param_knob;
-use param_knob::ParamKnob;
+use param_knob::{ParamKnob, ParamKnobSize};
 #[path="./components/param_int_knob.rs"]
 mod param_int_knob;
-use param_int_knob::ParamIntKnob;
+use param_int_knob::{ParamIntKnob, ParamIntKnobSize};
 #[path="ui_data.rs"]
 mod ui_data;
 use ui_data::{UiData, ParamChangeEvent};
 use vizia::{
   views::{VStack, HStack, Label}, 
   context::Context, 
-  prelude::{Units::{Stretch, Pixels}, Weight, LayoutType}, 
+  prelude::{Units::{Stretch, Pixels}, FontWeightKeyword, LayoutType}, 
   modifiers::{LayoutModifiers, StyleModifiers, TextModifiers}, 
-  state::Model
+  model::Model, layout::Units::Auto
 };
 use crate::repeat_parameters::RepeatParameters;
 use std::sync::Arc;
@@ -21,7 +21,7 @@ use vst::prelude::HostCallback;
 const STYLE: &str = include_str!("style.css");
 
 pub fn plugin_gui(cx: &mut Context, params: Arc<RepeatParameters>, host: Option<HostCallback>) {
-  cx.add_theme(STYLE);
+  let _ = cx.add_stylesheet(STYLE);
 
   UiData {
     params: params.clone(),
@@ -36,6 +36,7 @@ pub fn plugin_gui(cx: &mut Context, params: Arc<RepeatParameters>, host: Option<
         UiData::params,
         |params| &params.freq,
         |val| ParamChangeEvent::SetFreq(val),
+        ParamKnobSize::Regular
       );
       
       ParamIntKnob::new(
@@ -44,6 +45,7 @@ pub fn plugin_gui(cx: &mut Context, params: Arc<RepeatParameters>, host: Option<
         UiData::params,
         |params| &params.repeats,
         |val| ParamChangeEvent::SetRepeats(val),
+        ParamIntKnobSize::Regular
       );
       
       ParamKnob::new(
@@ -52,6 +54,7 @@ pub fn plugin_gui(cx: &mut Context, params: Arc<RepeatParameters>, host: Option<
         UiData::params,
         |params| &params.feedback,
         |val| ParamChangeEvent::SetFeedback(val),
+        ParamKnobSize::Regular
       );
       
       ParamKnob::new(
@@ -60,12 +63,13 @@ pub fn plugin_gui(cx: &mut Context, params: Arc<RepeatParameters>, host: Option<
         UiData::params,
         |params| &params.skew,
         |val| ParamChangeEvent::SetSkew(val),
-      )
-      .bottom(Pixels(24.0));
-    }).top(Pixels(16.0));
+        ParamKnobSize::Regular
+      ).top(Pixels(12.0));
+    }).child_space(Stretch(1.0)).col_between(Pixels(8.0));
+
     Label::new(cx, "dm-Repeat")
       .font_size(22.0)
-      .font_weight(Weight::BOLD)
+      .font_weight(FontWeightKeyword::Bold)
       .border_radius(Pixels(16.0))
       .border_width(Pixels(1.))
       .border_color("#005254")
@@ -76,7 +80,6 @@ pub fn plugin_gui(cx: &mut Context, params: Arc<RepeatParameters>, host: Option<
       .width(Pixels(144.0))
       .left(Stretch(1.0));
   })
-  .layout_type(LayoutType::Column)
   .child_space(Pixels(16.0))
   .background_color("#161616");
 }
