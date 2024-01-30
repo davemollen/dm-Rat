@@ -1,29 +1,29 @@
 use std::{sync::Arc, f32::consts::FRAC_1_SQRT_2};
 use nih_plug::prelude::*;
-use repeat::Repeat;
-mod repeat_parameters;
-use repeat_parameters::RepeatParameters;
+use ds1::DS1;
+mod ds1_parameters;
+use ds1_parameters::DS1Parameters;
 mod editor;
 
-struct DmRepeat {
-  params: Arc<RepeatParameters>,
-  repeat: Repeat,
+struct DmDS1 {
+  params: Arc<DS1Parameters>,
+  ds1: DS1,
 }
 
-impl Default for DmRepeat {
+impl Default for DmDS1 {
   fn default() -> Self {
-    let params = Arc::new(RepeatParameters::default());
+    let params = Arc::new(DS1Parameters::default());
     Self {
       params: params.clone(),
-      repeat: Repeat::new(44100.),
+      ds1: DS1::new(44100.),
     }
   }
 }
 
-impl Plugin for DmRepeat {
-  const NAME: &'static str = "dm-Repeat";
+impl Plugin for DmDS1 {
+  const NAME: &'static str = "dm-DS1-fir";
   const VENDOR: &'static str = "DM";
-  const URL: &'static str = "https://github.com/davemollen/dm-Repeat";
+  const URL: &'static str = "https://github.com/davemollen/dm-DS1";
   const EMAIL: &'static str = "davemollen@gmail.com";
   const VERSION: &'static str = env!("CARGO_PKG_VERSION");
   
@@ -55,7 +55,7 @@ impl Plugin for DmRepeat {
     buffer_config: &BufferConfig,
     _context: &mut impl InitContext<Self>,
   ) -> bool {
-    self.repeat = Repeat::new(buffer_config.sample_rate);
+    self.ds1 = DS1::new(buffer_config.sample_rate);
     true
   }
 
@@ -65,10 +65,9 @@ impl Plugin for DmRepeat {
     _aux: &mut AuxiliaryBuffers,
     _context: &mut impl ProcessContext<Self>,
   ) -> ProcessStatus {
-    let freq = self.params.freq.value();
-    let repeats = self.params.repeats.value();
-    let feedback = self.params.feedback.value();
-    let skew = self.params.skew.value();
+    let tone = self.params.tone.value();
+    let level = self.params.level.value();
+    let dist = self.params.dist.value();
 
     buffer.iter_samples().for_each(|mut channel_samples| {
       let left_channel_in = channel_samples.get_mut(0).unwrap();
@@ -76,12 +75,11 @@ impl Plugin for DmRepeat {
       let right_channel_in = channel_samples.get_mut(1).unwrap();
       let input_right = *right_channel_in;
 
-      let repeat_output = self.repeat.run(
+      let repeat_output = self.ds1.process(
         (input_left + input_right) * FRAC_1_SQRT_2,
-        freq,
-        repeats as usize,
-        feedback,
-        skew
+        tone,
+        level,
+        dist
       );
 
       let left_channel_out = channel_samples.get_mut(0).unwrap();
@@ -97,26 +95,27 @@ impl Plugin for DmRepeat {
   fn deactivate(&mut self) {}
 }
 
-impl ClapPlugin for DmRepeat {
-  const CLAP_ID: &'static str = "dm-Repeat";
-  const CLAP_DESCRIPTION: Option<&'static str> = Some("A delay plugin");
+impl ClapPlugin for DmDS1 {
+  const CLAP_ID: &'static str = "dm-DS1-fir";
+  const CLAP_DESCRIPTION: Option<&'static str> = Some("A distortion plugin");
   const CLAP_MANUAL_URL: Option<&'static str> = Some(Self::URL);
   const CLAP_SUPPORT_URL: Option<&'static str> = None;
   const CLAP_FEATURES: &'static [ClapFeature] = &[
     ClapFeature::AudioEffect,
-    ClapFeature::Stereo,
     ClapFeature::Mono,
     ClapFeature::Utility,
+    ClapFeature::Distortion
   ];
 }
 
-impl Vst3Plugin for DmRepeat {
-  const VST3_CLASS_ID: [u8; 16] = *b"dm-Repeat.......";
+impl Vst3Plugin for DmDS1 {
+  const VST3_CLASS_ID: [u8; 16] = *b"dm-DS1-fir......";
   const VST3_SUBCATEGORIES: &'static [Vst3SubCategory] = &[
     Vst3SubCategory::Fx, 
-    Vst3SubCategory::Delay
+    Vst3SubCategory::Mono,
+    Vst3SubCategory::Distortion
   ];
 }
 
-nih_export_clap!(DmRepeat);
-nih_export_vst3!(DmRepeat);
+nih_export_clap!(DmDS1);
+nih_export_vst3!(DmDS1);

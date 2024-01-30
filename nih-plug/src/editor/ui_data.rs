@@ -1,4 +1,4 @@
-use crate::repeat_parameters::RepeatParameters;
+use crate::ds1_parameters::DS1Parameters;
 use nih_plug::{prelude::GuiContext, params::internals::ParamPtr};
 use nih_plug_vizia::vizia::prelude::*;
 use std::sync::Arc;
@@ -8,7 +8,7 @@ pub enum ParamChangeEvent {
 
 #[derive(Lens)]
 pub struct UiData {
-  pub params: Arc<RepeatParameters>,
+  pub params: Arc<DS1Parameters>,
   pub gui_context: Arc<dyn GuiContext>,
 }
 
