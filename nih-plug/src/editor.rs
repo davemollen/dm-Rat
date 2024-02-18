@@ -20,7 +20,7 @@ const STYLE: &str = include_str!("./editor/style.css");
 
 // Makes sense to also define this here, makes it a bit easier to keep track of
 pub(crate) fn default_state() -> Arc<ViziaState> {
-  ViziaState::new(|| (280, 160))
+  ViziaState::new(|| (280, 200))
 }
 
 pub(crate) fn create(
@@ -75,17 +75,19 @@ pub(crate) fn create(
         .col_between(Pixels(8.0));
 
         Label::new(cx, "RAT")
-          .font_size(22.0)
-          .font_weight(FontWeightKeyword::Bold)
+          .font_size(32.0)
+          .font_weight(FontWeightKeyword::ExtraBold)
           .color("#eceaee")
           .background_color("#100f14")
           .border_color("#eceaee")
           .border_width(Pixels(1.0))
           .child_space(Stretch(1.0))
-          .child_top(Pixels(2.0))
-          .child_bottom(Pixels(5.0))
-          .width(Pixels(80.0))
-          .left(Stretch(1.0));
+          .width(Pixels(66.0))
+          .height(Pixels(32.0))
+          .top(Pixels(32.0))
+          .bottom(Pixels(32.0))
+          .left(Stretch(1.0))
+          .right(Stretch(1.0));
       })
       .child_space(Pixels(16.0))
       .background_color("#161616");
