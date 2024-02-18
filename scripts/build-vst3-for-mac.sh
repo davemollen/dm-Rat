@@ -1,6 +1,6 @@
-package_name="dm_ds1"
+package_name="dm_rat"
 move_from="./target/bundled/$package_name.vst3"
-move_to="/Library/Audio/Plug-Ins/VST3/dm-DS1-fir.vst3"
+move_to="/Library/Audio/Plug-Ins/VST3/dm-Rat.vst3"
 
 cd nih-plug
 cargo xtask bundle $package_name --release

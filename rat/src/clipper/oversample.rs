@@ -19,6 +19,7 @@ where
     let oversample_factor = T::oversample_factor();
 
     Self {
+      // TODO: fir should have a cutoff of 5.3kHz because of the slew rate of the op-amp
       upsample_fir: FirFilter::new(16),
       downsample_fir: FirFilter::new(16),
       oversample_factor,

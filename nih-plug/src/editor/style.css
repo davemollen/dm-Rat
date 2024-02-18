@@ -1,6 +1,6 @@
 label {
   font-size: 14px;
-  color: #100f14;
+  color: #e1d9d1;
 }
 
 knob {
@@ -9,31 +9,18 @@ knob {
 }
 
 knob .knob-track {
-  display: none;
+  color: #eceaee;
+  background-color: #363636;
 }
 
 knob .knob-head {
-  width: 1s;
-  height: 1s;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
-  border-width: 0px;
-  background-color: #100f14;
-}
-
-knob .knob-tick {
-  width: 4px;
-  height: 12px;
-  border-radius: 2px;
-  background-color: #eceaee;
+  display: none;
 }
 
 textbox {
   font-size: 12px;
   width: 72px;
-  color: #100f14;
+  color: #e1d9d1;
   background-color: transparent;
   border-width: 0px;
   outline-color: none;
@@ -44,4 +31,8 @@ textbox:hover {
   background-color: transparent;
   border-width: 0px;
   outline-color: none;
+}
+
+textbox:checked.caret {
+  caret-color: #e1d9d1;
 }

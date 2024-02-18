@@ -889,17 +889,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "dm_ds1"
+name = "dm_rat"
 version = "0.1.0"
 dependencies = [
- "ds1",
  "nih_plug",
  "nih_plug_vizia",
+ "rat",
 ]
-
-[[package]]
-name = "ds1"
-version = "0.1.0"
 
 [[package]]
 name = "dtoa"
@@ -2324,6 +2320,10 @@ name = "rangemap"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "977b1e897f9d764566891689e642653e5ed90c6895106acd005eb4c1d0203991"
+
+[[package]]
+name = "rat"
+version = "0.1.0"
 
 [[package]]
 name = "raw-window-handle"

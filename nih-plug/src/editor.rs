@@ -3,7 +3,7 @@ mod param_knob;
 use nih_plug::params::Param;
 use param_knob::{ParamKnob, ParamKnobSize};
 mod ui_data;
-use crate::ds1_parameters::DS1Parameters;
+use crate::rat_parameters::RatParameters;
 use nih_plug::prelude::Editor;
 use nih_plug_vizia::vizia::{
   model::Model,
@@ -24,7 +24,7 @@ pub(crate) fn default_state() -> Arc<ViziaState> {
 }
 
 pub(crate) fn create(
-  params: Arc<DS1Parameters>,
+  params: Arc<RatParameters>,
   editor_state: Arc<ViziaState>,
 ) -> Option<Box<dyn Editor>> {
   create_vizia_editor(
@@ -43,30 +43,30 @@ pub(crate) fn create(
         HStack::new(cx, |cx| {
           ParamKnob::new(
             cx,
-            params.tone.name(),
+            params.distortion.name(),
             UiData::params,
-            params.tone.as_ptr(),
-            |params| &params.tone,
+            params.distortion.as_ptr(),
+            |params| &params.distortion,
             |param_ptr, val| ParamChangeEvent::SetParam(param_ptr, val),
             ParamKnobSize::Regular,
           );
 
           ParamKnob::new(
             cx,
-            params.level.name(),
+            params.filter.name(),
             UiData::params,
-            params.level.as_ptr(),
-            |params| &params.level,
+            params.filter.as_ptr(),
+            |params| &params.filter,
             |param_ptr, val| ParamChangeEvent::SetParam(param_ptr, val),
             ParamKnobSize::Regular,
           );
 
           ParamKnob::new(
             cx,
-            params.dist.name(),
+            params.volume.name(),
             UiData::params,
-            params.dist.as_ptr(),
-            |params| &params.dist,
+            params.volume.as_ptr(),
+            |params| &params.volume,
             |param_ptr, val| ParamChangeEvent::SetParam(param_ptr, val),
             ParamKnobSize::Regular,
           );
@@ -74,20 +74,21 @@ pub(crate) fn create(
         .child_space(Stretch(1.0))
         .col_between(Pixels(8.0));
 
-        Label::new(cx, "DS1")
+        Label::new(cx, "RAT")
           .font_size(22.0)
           .font_weight(FontWeightKeyword::Bold)
-          .border_radius(Pixels(16.0))
           .color("#eceaee")
           .background_color("#100f14")
+          .border_color("#eceaee")
+          .border_width(Pixels(1.0))
           .child_space(Stretch(1.0))
-          .child_top(Pixels(3.0))
+          .child_top(Pixels(2.0))
           .child_bottom(Pixels(5.0))
           .width(Pixels(80.0))
           .left(Stretch(1.0));
       })
       .child_space(Pixels(16.0))
-      .background_color("#DB783D");
+      .background_color("#161616");
     },
   )
 }

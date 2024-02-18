@@ -1,32 +1,32 @@
-use std::{sync::Arc, f32::consts::FRAC_1_SQRT_2};
 use nih_plug::prelude::*;
-use ds1::DS1;
-mod ds1_parameters;
-use ds1_parameters::DS1Parameters;
+use rat::Rat;
+use std::{f32::consts::FRAC_1_SQRT_2, sync::Arc};
+mod rat_parameters;
+use rat_parameters::RatParameters;
 mod editor;
 
-struct DmDS1 {
-  params: Arc<DS1Parameters>,
-  ds1: DS1,
+struct DmRat {
+  params: Arc<RatParameters>,
+  rat: Rat,
 }
 
-impl Default for DmDS1 {
+impl Default for DmRat {
   fn default() -> Self {
-    let params = Arc::new(DS1Parameters::default());
+    let params = Arc::new(RatParameters::default());
     Self {
       params: params.clone(),
-      ds1: DS1::new(44100.),
+      rat: Rat::new(44100.),
     }
   }
 }
 
-impl Plugin for DmDS1 {
-  const NAME: &'static str = "dm-DS1-fir";
+impl Plugin for DmRat {
+  const NAME: &'static str = "dm-Rat";
   const VENDOR: &'static str = "DM";
-  const URL: &'static str = "https://github.com/davemollen/dm-DS1";
+  const URL: &'static str = "https://github.com/davemollen/dm-Rat";
   const EMAIL: &'static str = "davemollen@gmail.com";
   const VERSION: &'static str = env!("CARGO_PKG_VERSION");
-  
+
   const AUDIO_IO_LAYOUTS: &'static [AudioIOLayout] = &[AudioIOLayout {
     main_input_channels: NonZeroU32::new(2),
     main_output_channels: NonZeroU32::new(2),
@@ -34,7 +34,7 @@ impl Plugin for DmDS1 {
   }];
   const MIDI_INPUT: MidiConfig = MidiConfig::None;
   const SAMPLE_ACCURATE_AUTOMATION: bool = true;
-  
+
   // More advanced plugins can use this to run expensive background tasks. See the field's
   // documentation for more information. `()` means that the plugin does not have any background
   // tasks.
@@ -55,7 +55,7 @@ impl Plugin for DmDS1 {
     buffer_config: &BufferConfig,
     _context: &mut impl InitContext<Self>,
   ) -> bool {
-    self.ds1 = DS1::new(buffer_config.sample_rate);
+    self.rat = Rat::new(buffer_config.sample_rate);
     true
   }
 
@@ -65,9 +65,9 @@ impl Plugin for DmDS1 {
     _aux: &mut AuxiliaryBuffers,
     _context: &mut impl ProcessContext<Self>,
   ) -> ProcessStatus {
-    let tone = self.params.tone.value();
-    let level = self.params.level.value();
-    let dist = self.params.dist.value();
+    let distortion = self.params.distortion.value();
+    let filter = self.params.filter.value();
+    let volume = self.params.volume.value();
 
     buffer.iter_samples().for_each(|mut channel_samples| {
       let left_channel_in = channel_samples.get_mut(0).unwrap();
@@ -75,11 +75,11 @@ impl Plugin for DmDS1 {
       let right_channel_in = channel_samples.get_mut(1).unwrap();
       let input_right = *right_channel_in;
 
-      let repeat_output = self.ds1.process(
+      let repeat_output = self.rat.process(
         (input_left + input_right) * FRAC_1_SQRT_2,
-        tone,
-        level,
-        dist
+        distortion,
+        filter,
+        volume,
       );
 
       let left_channel_out = channel_samples.get_mut(0).unwrap();
@@ -95,8 +95,8 @@ impl Plugin for DmDS1 {
   fn deactivate(&mut self) {}
 }
 
-impl ClapPlugin for DmDS1 {
-  const CLAP_ID: &'static str = "dm-DS1-fir";
+impl ClapPlugin for DmRat {
+  const CLAP_ID: &'static str = "dm-Rat";
   const CLAP_DESCRIPTION: Option<&'static str> = Some("A distortion plugin");
   const CLAP_MANUAL_URL: Option<&'static str> = Some(Self::URL);
   const CLAP_SUPPORT_URL: Option<&'static str> = None;
@@ -104,18 +104,18 @@ impl ClapPlugin for DmDS1 {
     ClapFeature::AudioEffect,
     ClapFeature::Mono,
     ClapFeature::Utility,
-    ClapFeature::Distortion
+    ClapFeature::Distortion,
   ];
 }
 
-impl Vst3Plugin for DmDS1 {
-  const VST3_CLASS_ID: [u8; 16] = *b"dm-DS1-fir......";
+impl Vst3Plugin for DmRat {
+  const VST3_CLASS_ID: [u8; 16] = *b"dm-Rat..........";
   const VST3_SUBCATEGORIES: &'static [Vst3SubCategory] = &[
-    Vst3SubCategory::Fx, 
+    Vst3SubCategory::Fx,
     Vst3SubCategory::Mono,
-    Vst3SubCategory::Distortion
+    Vst3SubCategory::Distortion,
   ];
 }
 
-nih_export_clap!(DmDS1);
-nih_export_vst3!(DmDS1);
+nih_export_clap!(DmRat);
+nih_export_vst3!(DmRat);
