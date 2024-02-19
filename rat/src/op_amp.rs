@@ -33,7 +33,7 @@ impl OpAmp {
   }
 
   fn get_s_domain_coefficients(&self, distortion: f32) -> ([f32; 4], [f32; 4]) {
-    let z2_b0 = distortion * 99999. + 1.;
+    let z2_b0 = (distortion * 100000.).max(1.);
     let z2_a0 = z2_b0 * 1e-10;
 
     let z1_b0 = 2.72149e-7;
@@ -41,12 +41,13 @@ impl OpAmp {
     let z1_a0 = 6.27638e-9;
     let z1_a1 = 0.0000069;
 
-    let b0 = z1_b0 * z2_a0;
-    let a0 = b0;
+    let a0 = z1_b0 * z2_a0;
     let a1 = z1_b0 + z1_b1 * z2_a0;
+    let a2 = z1_b1 + z2_a0;
+    let b0 = a0;
     let b1 = a1 + z1_a0 * z2_b0;
     let b2 = z1_a1 * z2_b0 + z1_b1 + z2_a0;
-    let a2 = z1_b1 + z2_a0;
+
     (
       [b0 / a0, b1 / a0, b2 / a0, 1. / a0],
       [1., a1 / a0, a2 / a0, 1. / a0],
@@ -82,17 +83,6 @@ impl OpAmp {
 #[cfg(test)]
 mod tests {
   use super::OpAmp;
-
-  #[test]
-  fn s_domain_coefficients_should_be_correct_for_distortion_at_zero() {
-    let op_amp = OpAmp::new(44100.);
-
-    let coeffs: ([f32; 4], [f32; 4]) = (
-      [1.0, 230732960.0, 254546380000.0, 367445770000.0],
-      [1.0, 110051.12, 1008785700.0, 367445770000.0],
-    );
-    assert_eq!(op_amp.get_s_domain_coefficients(0.), coeffs)
-  }
 
   #[test]
   fn s_domain_coefficients_should_be_correct_for_distortion_at_one() {
@@ -136,6 +126,17 @@ mod tests {
       [1.0, 100010030.0, 1005114750000.0, 367445730000000.0],
     );
     assert_eq!(op_amp.get_s_domain_coefficients(0.001), coeffs)
+  }
+
+  #[test]
+  fn s_domain_coefficients_should_be_correct_for_distortion_at_one_hundred_thousandth() {
+    let op_amp = OpAmp::new(44100.);
+
+    let coeffs: ([f32; 4], [f32; 4]) = (
+      [1., 1.02306457e+10, 1.00764658e+14, 3.67445774e+16],
+      [1., 1.00000000e+10, 1.00511121e+14, 3.67445774e+16],
+    );
+    assert_eq!(op_amp.get_s_domain_coefficients(0.00001), coeffs)
   }
 
   #[test]
