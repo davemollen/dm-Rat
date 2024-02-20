@@ -29,7 +29,10 @@ impl Rat {
   }
 
   pub fn process(&mut self, input: f32, distortion: f32, filter: f32, volume: f32) -> f32 {
-    let (distortion, filter, volume) = self.smooth_parameters.process(distortion, filter, volume);
+    let (distortion, filter, volume) =
+      self
+        .smooth_parameters
+        .process(distortion * distortion, filter * filter, volume * volume);
     let op_amp_output = self.op_amp.process(input, distortion);
     let clipper_output = self.clipper.process(op_amp_output);
     let tone_output = self.tone.process(clipper_output, filter);
