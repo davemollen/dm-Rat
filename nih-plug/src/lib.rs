@@ -21,7 +21,7 @@ impl Default for DmRat {
 }
 
 impl Plugin for DmRat {
-  const NAME: &'static str = "dm-Rat";
+  const NAME: &'static str = "dm-RatSlew";
   const VENDOR: &'static str = "DM";
   const URL: &'static str = "https://github.com/davemollen/dm-Rat";
   const EMAIL: &'static str = "davemollen@gmail.com";
@@ -109,7 +109,7 @@ impl ClapPlugin for DmRat {
 }
 
 impl Vst3Plugin for DmRat {
-  const VST3_CLASS_ID: [u8; 16] = *b"dm-Rat..........";
+  const VST3_CLASS_ID: [u8; 16] = *b"dm-RatSlew......";
   const VST3_SUBCATEGORIES: &'static [Vst3SubCategory] = &[
     Vst3SubCategory::Fx,
     Vst3SubCategory::Mono,
