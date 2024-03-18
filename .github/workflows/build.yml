@@ -89,18 +89,23 @@ jobs:
 
       - name: Move all packaged plugin into a directory
         run: |
-          # GitHub Action strips the top level directory, great, have another one
-          mkdir -p "$ARCHIVE_NAME/$ARCHIVE_NAME"
-          mv ./nih-plug/target/bundled/* "$ARCHIVE_NAME/$ARCHIVE_NAME"
+          mkdir -p $ARCHIVE_NAME
+          mv ./nih-plug/target/bundled/* $ARCHIVE_NAME
 
       - name: Rename plugins
         run: |
-          for file_name in $ARCHIVE_NAME/$ARCHIVE_NAME/$binary_name.*; do mv $file_name "${file_name/$binary_name/$plugin_name}"; done
+          for file_name in $ARCHIVE_NAME/$binary_name.*; 
+            do mv $file_name "${file_name/$binary_name/$plugin_name}"; 
+          done
 
       - name: Add an OS-specific readme file with installation instructions
-        run: cp ".github/workflows/readme-${{ runner.os }}.txt" "$ARCHIVE_NAME/$ARCHIVE_NAME/README.txt"
+        run: cp ".github/workflows/readme-${{ runner.os }}.txt" "$ARCHIVE_NAME/README.txt"
 
-      - uses: actions/upload-artifact@v4
+      - name: Zip files
+        run: tar -cf $ARCHIVE_NAME.zip $ARCHIVE_NAME
+
+      - name: Add zip to release
+        uses: softprops/action-gh-release@v2
         with:
-          name: ${{ env.ARCHIVE_NAME }}
-          path: ${{ env.ARCHIVE_NAME }}
+          name: ${{github.ref_name}}
+          files: ${{ env.ARCHIVE_NAME }}.zip
