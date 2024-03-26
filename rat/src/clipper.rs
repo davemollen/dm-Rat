@@ -1,6 +1,6 @@
 mod oversample;
 use oversample::Oversample;
-use std::simd::{f32x8, StdFloat};
+use simba::simd::{f32x8, SimdComplexField};
 
 pub struct Clipper {
   oversample: Oversample<f32x8>,
@@ -15,11 +15,19 @@ impl Clipper {
 
   pub fn process(&mut self, input: f32) -> f32 {
     self.oversample.process(input, |x| {
-      let x2 = x * x;
-      let x3 = x2 * x;
-      let x5 = x3 * x2;
-      let a = x + f32x8::splat(0.16489087) * x3 + f32x8::splat(0.00985468) * x5;
-      a / (f32x8::splat(1.0) + a * a).sqrt()
+      // x.simd_tanh()
+
+      let squared_self = x * x;
+      let z = f32x8::splat(135135.);
+
+      let a = x
+        * (z
+          + squared_self
+            * (f32x8::splat(17325.) + squared_self * (f32x8::splat(378.) + squared_self)));
+      let b = z
+        + squared_self
+          * (f32x8::splat(62370.) + squared_self * (f32x8::splat(3150.) + squared_self * 28.));
+      a / b
     }) * 0.3728
   }
 }

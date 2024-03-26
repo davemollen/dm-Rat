@@ -1,4 +1,4 @@
-use std::simd::{f32x16, f32x2, f32x4, f32x8};
+use simba::simd::{f32x16, f32x2, f32x4, f32x8};
 
 // These are all minimum phase FIR filter
 pub trait Coefficients {
