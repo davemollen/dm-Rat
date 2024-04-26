@@ -70,10 +70,9 @@ impl Plugin for DmRat {
     let volume = self.params.volume.value();
 
     buffer.iter_samples().for_each(|mut channel_samples| {
-      let input = channel_samples.get_mut(0).unwrap();
-      let repeat_output = self.rat.process(*input, distortion, filter, volume);
-      let output = channel_samples.get_mut(0).unwrap();
-      *output = repeat_output;
+      let sample = channel_samples.iter_mut().next().unwrap();
+      let rat_output = self.rat.process(*sample, distortion, filter, volume);
+      *sample = rat_output;
     });
     ProcessStatus::Normal
   }
