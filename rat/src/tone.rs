@@ -13,10 +13,13 @@ impl Tone {
   }
 
   pub fn process(&mut self, input: f32, tone: f32) -> f32 {
+    let cutoff_freq = self.get_cutoff_frequency(tone);
+    self.lowpass.process(input, cutoff_freq)
+  }
+
+  fn get_cutoff_frequency(&self, tone: f32) -> f32 {
     let resistor = tone * 100000. + 1500.;
     let capacitor = 3.3e-9_f32;
-    let radians_per_sec = (resistor * capacitor).recip();
-    let frequency = radians_per_sec / TAU;
-    self.lowpass.process(input, frequency)
+    (TAU * resistor * capacitor).recip()
   }
 }
