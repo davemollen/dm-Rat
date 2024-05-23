@@ -1,5 +1,8 @@
 use crate::shared::one_pole_filter::OnePoleFilter;
 
+const MAX_DB_AT_ONE_HZ: f32 = 120.9794;
+const DECREASE_PER_DECADE: f32 = 20.;
+
 pub struct OpAmpCorrection {
   filter: OnePoleFilter,
 }
@@ -19,15 +22,13 @@ impl OpAmpCorrection {
     let r1 = distortion * 100000.;
     let r2 = 560.;
     let r3 = 47.;
-    let gain = 1. + r1 / (r2 * r2 / (r2 + r3));
+    let gain = 1. + r1 / (r2 * r3 / (r2 + r3));
     self.atodb(gain)
   }
 
   fn get_cutoff_frequency(&self, distortion: f32) -> f32 {
     let db_gain = self.get_db_gain(distortion);
-    let max_db_at_one_hz = 120.9794;
-    let decrease_per_decade = 20.;
-    let decade_fraction = (max_db_at_one_hz - db_gain) / decrease_per_decade;
+    let decade_fraction = (MAX_DB_AT_ONE_HZ - db_gain) / DECREASE_PER_DECADE;
     10_f32.powf(decade_fraction)
   }
 
