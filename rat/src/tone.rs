@@ -1,14 +1,14 @@
-use crate::shared::lowpass_filter::LowpassFilter;
+use crate::shared::one_pole_filter::OnePoleFilter;
 use std::f32::consts::TAU;
 
 pub struct Tone {
-  lowpass: LowpassFilter,
+  lowpass: OnePoleFilter,
 }
 
 impl Tone {
   pub fn new(sample_rate: f32) -> Self {
     Self {
-      lowpass: LowpassFilter::new(sample_rate),
+      lowpass: OnePoleFilter::new(sample_rate),
     }
   }
 

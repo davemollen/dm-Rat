@@ -1,13 +1,13 @@
-use crate::shared::lowpass_filter::LowpassFilter;
+use crate::shared::one_pole_filter::OnePoleFilter;
 
 pub struct OpAmpCorrection {
-  filter: LowpassFilter,
+  filter: OnePoleFilter,
 }
 
 impl OpAmpCorrection {
   pub fn new(sample_rate: f32) -> Self {
     Self {
-      filter: LowpassFilter::new(sample_rate),
+      filter: OnePoleFilter::new(sample_rate),
     }
   }
 

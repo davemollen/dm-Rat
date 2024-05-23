@@ -9,7 +9,7 @@ mod smooth_parameters;
 use smooth_parameters::SmoothParameters;
 mod shared {
   pub mod float_ext;
-  pub mod lowpass_filter;
+  pub mod one_pole_filter;
 }
 
 pub struct Rat {
