@@ -56,6 +56,13 @@ impl Plugin for DmRat {
     _context: &mut impl InitContext<Self>,
   ) -> bool {
     self.rat = Rat::new(buffer_config.sample_rate);
+
+    let distortion = self.params.distortion.value();
+    let filter = self.params.filter.value();
+    let volume = self.params.volume.value();
+    self
+      .rat
+      .initialize_params_to_smooth(distortion * distortion, filter * filter, volume * volume);
     true
   }
 
@@ -68,6 +75,9 @@ impl Plugin for DmRat {
     let distortion = self.params.distortion.value();
     let filter = self.params.filter.value();
     let volume = self.params.volume.value();
+    let distortion = distortion * distortion;
+    let filter = filter * filter;
+    let volume = volume * volume;
 
     buffer.iter_samples().for_each(|mut channel_samples| {
       let sample = channel_samples.iter_mut().next().unwrap();

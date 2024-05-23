@@ -15,6 +15,7 @@ struct Ports {
 #[uri("https://github.com/davemollen/dm-Rat")]
 struct DmRat {
   rat: Rat,
+  is_active: bool,
 }
 
 impl Plugin for DmRat {
@@ -29,6 +30,7 @@ impl Plugin for DmRat {
   fn new(_plugin_info: &PluginInfo, _features: &mut ()) -> Option<Self> {
     Some(Self {
       rat: Rat::new(_plugin_info.sample_rate() as f32),
+      is_active: false,
     })
   }
 
@@ -38,6 +40,16 @@ impl Plugin for DmRat {
     let distortion = *ports.distortion;
     let filter = *ports.filter;
     let volume = *ports.volume;
+    let distortion = distortion * distortion;
+    let filter = filter * filter;
+    let volume = volume * volume;
+
+    if !self.is_active {
+      self
+        .rat
+        .initialize_params_to_smooth(distortion, filter, volume);
+      self.is_active = true;
+    }
 
     for (input, output) in ports.input.iter().zip(ports.output.iter_mut()) {
       *output = self.rat.process(*input, distortion, filter, volume);
