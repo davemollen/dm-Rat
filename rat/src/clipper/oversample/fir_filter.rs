@@ -12,6 +12,8 @@ pub trait SimdFir {
 pub struct FirFilter<T> {
   buffer: Vec<T>,
   coefficients: Vec<T>,
+  index: usize,
+  mask: usize,
 }
 
 impl<T: SimdType> SimdFir for FirFilter<T>
@@ -21,9 +23,13 @@ where
   type Float = T;
 
   fn new(length: usize) -> Self {
+    debug_assert!(length.is_power_of_two());
+
     Self {
       buffer: vec![T::splat(0.); length],
       coefficients: Coefficients::new(),
+      index: 0,
+      mask: length - 1,
     }
   }
 
@@ -33,16 +39,17 @@ where
   }
 
   fn write(&mut self, input: Self::Float) {
-    self.buffer.insert(0, input);
-    self.buffer.pop();
+    self.buffer[self.index] = input;
+    self.index = self.index + 1 & self.mask;
   }
 
   fn convolve(&self) -> T {
     let coefficients = &self.coefficients;
 
-    self
-      .buffer
+    let (front, back) = self.buffer.split_at(self.index);
+    back
       .iter()
+      .chain(front)
       .zip(coefficients)
       .map(|(input, coeff)| *input * *coeff)
       .sum::<T>()
