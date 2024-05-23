@@ -1,6 +1,6 @@
 use std::simd::{f32x16, f32x2, f32x4, f32x8};
 
-// These are all minimum phase FIR filter
+// These are all minimum phase FIR filters
 pub trait Coefficients {
   fn new() -> Self;
 }

@@ -1,26 +1,30 @@
 mod coefficients;
 pub use coefficients::Coefficients;
+mod slew_coefficients;
+pub use slew_coefficients::SlewCoefficients;
 mod fir_filter;
 use fir_filter::{FirFilter, SimdFir};
+mod slew_fir_filter;
+use slew_fir_filter::SlewFirFilter;
 mod simd_type;
 use simd_type::SimdType;
 
 pub struct Oversample<T> {
-  upsample_fir: FirFilter<T>,
+  upsample_fir: SlewFirFilter<T>,
   downsample_fir: FirFilter<T>,
   oversample_factor: usize,
 }
 
 impl<T: SimdType> Oversample<T>
 where
+  Vec<T>: SlewCoefficients,
   Vec<T>: Coefficients,
 {
   pub fn new() -> Self {
     let oversample_factor = T::oversample_factor();
 
     Self {
-      // TODO: fir should have a cutoff of 5.3kHz because of the slew rate of the op-amp
-      upsample_fir: FirFilter::new(16),
+      upsample_fir: SlewFirFilter::new(16),
       downsample_fir: FirFilter::new(16),
       oversample_factor,
     }
