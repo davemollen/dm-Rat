@@ -20,7 +20,7 @@ class DistortionPotValue(float, Enum):
   HUNDRED_THOUSAND = 100000.
 
 # Change the distortion_pot_value to see the difference in the frequency response
-distortion_pot_value = DistortionPotValue.HUNDRED_THOUSAND
+distortion_pot_value = DistortionPotValue.ONE
 
 # Use predefined s-domain coefficients
 match distortion_pot_value:
@@ -84,8 +84,8 @@ def generate_s_domain_coefficients(distortion_pot_value):
   b2 = z1_a1 * z2_b0 + z1_b1 + z2_a0
 
   return (
-    [b0 / a0, b1 / a0, b2 / a0, 1. / a0],
-    [1., a1 / a0, a2 / a0, 1. / a0],
+    [b0, b1, b2, 1.],
+    [a0, a1, a2, 1.],
   )
 
 # Use s-domain coefficients derived from just the distortion_pot_value
