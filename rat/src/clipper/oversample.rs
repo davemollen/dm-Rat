@@ -1,58 +1,51 @@
 mod coefficients;
-pub use coefficients::Coefficients;
-mod slew_coefficients;
-pub use slew_coefficients::SlewCoefficients;
 mod fir_filter;
-use fir_filter::{FirFilter, SimdFir};
-mod slew_fir_filter;
-use slew_fir_filter::SlewFirFilter;
-mod simd_type;
-use simd_type::SimdType;
+mod slew_coefficients;
+use {
+  coefficients::Coefficients,
+  fir_filter::FirFilter,
+  slew_coefficients::SlewCoefficients,
+  std::simd::{f32x8, num::SimdFloat},
+};
 
-pub struct Oversample<T> {
-  upsample_fir: SlewFirFilter<T>,
-  downsample_fir: FirFilter<T>,
-  oversample_factor: usize,
+const OVERSAMPLE_FACTOR: f32 = 8.;
+
+pub struct Oversample {
+  upsample_fir: FirFilter,
+  downsample_fir: FirFilter,
 }
 
-impl<T: SimdType> Oversample<T>
-where
-  Vec<T>: SlewCoefficients,
-  Vec<T>: Coefficients,
-{
+impl Oversample {
   pub fn new() -> Self {
-    let oversample_factor = T::oversample_factor();
-
     Self {
-      upsample_fir: SlewFirFilter::new(16),
-      downsample_fir: FirFilter::new(16),
-      oversample_factor,
+      upsample_fir: FirFilter::new(SlewCoefficients::new()),
+      downsample_fir: FirFilter::new(Coefficients::new()),
     }
   }
 
   pub fn process<F>(&mut self, input: f32, callback: F) -> f32
   where
-    F: Fn(T) -> T,
+    F: Fn(f32x8) -> f32x8,
   {
     let upsampled = self.upsample(input);
     let processed = self.run_upsampled_process(upsampled, callback);
     self.downsample(processed)
   }
 
-  fn upsample(&mut self, input: f32) -> T {
+  fn upsample(&mut self, input: f32) -> f32x8 {
     self
       .upsample_fir
-      .process(SimdType::splat(input * self.oversample_factor as f32))
+      .process(f32x8::splat(input * OVERSAMPLE_FACTOR))
   }
 
-  fn run_upsampled_process<F>(&mut self, input: T, callback: F) -> T
+  fn run_upsampled_process<F>(&mut self, input: f32x8, callback: F) -> f32x8
   where
-    F: Fn(T) -> T,
+    F: Fn(f32x8) -> f32x8,
   {
     callback(input)
   }
 
-  fn downsample(&mut self, input: T) -> f32 {
+  fn downsample(&mut self, input: f32x8) -> f32 {
     self.downsample_fir.process(input).reduce_sum()
   }
 }

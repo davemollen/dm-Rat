@@ -1,6 +1,6 @@
 #!python
 
-from numpy import pi, absolute
+from numpy import pi, absolute, array, array_split, ceil
 from scipy.signal import minimum_phase, firwin, freqz, kaiser_beta
 from pylab import figure, clf, plot, xlabel, ylabel, ylim, title, grid, show
 
@@ -9,7 +9,7 @@ from pylab import figure, clf, plot, xlabel, ylabel, ylim, title, grid, show
 #------------------------------------------------
 
 # Oversampling factor should be a number that's a power of two
-oversampling = 16
+oversampling = 8
 base_length = 32
 base_sample_rate = 44100.0
 
@@ -21,11 +21,6 @@ print('sample_rate', sample_rate)
 # The Nyquist rate of the signal.
 nyq_rate = sample_rate / 2.0
 
-# The desired width of the transition from pass to stop,
-# relative to the Nyquist rate.  We'll design the filter
-# with a 5 Hz transition width.
-width = 2050.0/nyq_rate
-
 # The desired attenuation in the stop band, in dB.
 ripple_db = 90.0
 
@@ -34,13 +29,22 @@ ripple_db = 90.0
 beta = kaiser_beta(ripple_db)
 
 # The cutoff frequency of the filter.
-cutoff_hz = 22050.0 - 2050.0
+cutoff_hz = 20727.
 
 # Use firwin with a Kaiser window to create a lowpass FIR filter.
 taps = firwin(N, cutoff_hz/nyq_rate, window=('kaiser', beta))
 
 taps_min_phase = minimum_phase(taps, method='homomorphic', n_fft=None)
-print('FIR coefficients: ', taps_min_phase)
+
+#------------------------------------------------
+# Print coefficients
+#------------------------------------------------
+def split_into_subgroups(arr, n):
+    arr = array(arr)
+    return array_split(arr, ceil(len(arr) / n))
+
+fir_coeffs = split_into_subgroups(taps_min_phase, oversampling)
+print('FIR coefficients: ', fir_coeffs)
 
 #------------------------------------------------
 # Plot the minimum phase FIR filter coefficients.

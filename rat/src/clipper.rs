@@ -3,7 +3,7 @@ use oversample::Oversample;
 use std::simd::{f32x8, StdFloat};
 
 pub struct Clipper {
-  oversample: Oversample<f32x8>,
+  oversample: Oversample,
 }
 
 impl Clipper {

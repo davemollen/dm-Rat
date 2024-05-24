@@ -1,49 +1,36 @@
-use super::{simd_type::SimdType, Coefficients};
+use std::simd::f32x8;
 
-pub trait SimdFir {
-  type Float;
-
-  fn new(length: usize) -> Self;
-  fn write(&mut self, input: Self::Float);
-  fn convolve(&self) -> Self::Float;
-  fn process(&mut self, input: Self::Float) -> Self::Float;
-}
-
-pub struct FirFilter<T> {
-  buffer: Vec<T>,
-  coefficients: Vec<T>,
+pub struct FirFilter {
+  buffer: Vec<f32x8>,
+  coefficients: Vec<f32x8>,
   index: usize,
   mask: usize,
 }
 
-impl<T: SimdType> SimdFir for FirFilter<T>
-where
-  Vec<T>: Coefficients,
-{
-  type Float = T;
-
-  fn new(length: usize) -> Self {
+impl FirFilter {
+  pub fn new(coefficients: Vec<f32x8>) -> Self {
+    let length = coefficients.len();
     debug_assert!(length.is_power_of_two());
 
     Self {
-      buffer: vec![T::splat(0.); length],
-      coefficients: Coefficients::new(),
+      buffer: vec![f32x8::splat(0.); length],
+      coefficients,
       index: 0,
       mask: length - 1,
     }
   }
 
-  fn process(&mut self, input: Self::Float) -> T {
+  pub fn process(&mut self, input: f32x8) -> f32x8 {
     self.write(input);
     self.convolve()
   }
 
-  fn write(&mut self, input: Self::Float) {
+  fn write(&mut self, input: f32x8) {
     self.buffer[self.index] = input;
     self.index = self.index + 1 & self.mask;
   }
 
-  fn convolve(&self) -> T {
+  fn convolve(&self) -> f32x8 {
     let coefficients = &self.coefficients;
 
     let (front, back) = self.buffer.split_at(self.index);
@@ -52,6 +39,6 @@ where
       .chain(front)
       .zip(coefficients)
       .map(|(input, coeff)| *input * *coeff)
-      .sum::<T>()
+      .sum()
   }
 }
