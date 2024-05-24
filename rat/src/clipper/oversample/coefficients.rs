@@ -2,7 +2,6 @@ use std::simd::f32x8;
 
 pub struct Coefficients;
 
-// fs/4
 impl Coefficients {
   pub fn new() -> Vec<f32x8> {
     vec![

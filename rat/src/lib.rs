@@ -29,7 +29,7 @@ impl Rat {
     }
   }
 
-  pub fn initialize_params_to_smooth(&mut self, distortion: f32, filter: f32, volume: f32) {
+  pub fn initialize_params(&mut self, distortion: f32, filter: f32, volume: f32) {
     self
       .smooth_parameters
       .initialize(distortion, filter, volume);

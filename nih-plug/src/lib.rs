@@ -10,6 +10,16 @@ struct DmRat {
   rat: Rat,
 }
 
+impl DmRat {
+  fn get_params(&self) -> (f32, f32, f32) {
+    let distortion = self.params.distortion.value();
+    let filter = self.params.filter.value();
+    let volume = self.params.volume.value();
+
+    (distortion * distortion, filter * filter, volume * volume)
+  }
+}
+
 impl Default for DmRat {
   fn default() -> Self {
     let params = Arc::new(RatParameters::default());
@@ -56,13 +66,8 @@ impl Plugin for DmRat {
     _context: &mut impl InitContext<Self>,
   ) -> bool {
     self.rat = Rat::new(buffer_config.sample_rate);
-
-    let distortion = self.params.distortion.value();
-    let filter = self.params.filter.value();
-    let volume = self.params.volume.value();
-    self
-      .rat
-      .initialize_params_to_smooth(distortion * distortion, filter * filter, volume * volume);
+    let (distortion, filter, volume) = self.get_params();
+    self.rat.initialize_params(distortion, filter, volume);
     true
   }
 
@@ -72,12 +77,7 @@ impl Plugin for DmRat {
     _aux: &mut AuxiliaryBuffers,
     _context: &mut impl ProcessContext<Self>,
   ) -> ProcessStatus {
-    let distortion = self.params.distortion.value();
-    let filter = self.params.filter.value();
-    let volume = self.params.volume.value();
-    let distortion = distortion * distortion;
-    let filter = filter * filter;
-    let volume = volume * volume;
+    let (distortion, filter, volume) = self.get_params();
 
     buffer.iter_samples().for_each(|mut channel_samples| {
       let sample = channel_samples.iter_mut().next().unwrap();

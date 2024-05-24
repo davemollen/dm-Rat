@@ -45,9 +45,7 @@ impl Plugin for DmRat {
     let volume = volume * volume;
 
     if !self.is_active {
-      self
-        .rat
-        .initialize_params_to_smooth(distortion, filter, volume);
+      self.rat.initialize_params(distortion, filter, volume);
       self.is_active = true;
     }
 
