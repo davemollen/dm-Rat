@@ -12,6 +12,9 @@ pub struct OpAmp {
 }
 
 impl OpAmp {
+  const R1: f32 = 100000.;
+  const C1: f32 = 1e-10;
+
   pub fn new(sample_rate: f32) -> Self {
     Self {
       op_amp: ThirdOrderIIRFilter::new(),
@@ -30,8 +33,8 @@ impl OpAmp {
   }
 
   fn get_s_domain_coefficients(&self, distortion: f32) -> ([f32; 4], [f32; 4]) {
-    let z2_b0 = (distortion * 100000.).max(1.);
-    let z2_a0 = z2_b0 * 1e-10;
+    let z2_b0 = (distortion * Self::R1).max(1.);
+    let z2_a0 = z2_b0 * Self::C1;
 
     let z1_b0 = 2.72149e-7;
     let z1_b1 = 0.0027354;

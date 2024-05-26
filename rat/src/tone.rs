@@ -6,6 +6,10 @@ pub struct Tone {
 }
 
 impl Tone {
+  const R1: f32 = 100000.;
+  const R2: f32 = 1500.;
+  const C1: f32 = 3.3e-9;
+
   pub fn new(sample_rate: f32) -> Self {
     Self {
       lowpass: OnePoleFilter::new(sample_rate),
@@ -18,8 +22,7 @@ impl Tone {
   }
 
   fn get_cutoff_frequency(&self, tone: f32) -> f32 {
-    let resistor = tone * 100000. + 1500.;
-    let capacitor = 3.3e-9_f32;
-    (TAU * resistor * capacitor).recip()
+    let resistor = tone * Self::R1 + Self::R2;
+    (TAU * resistor * Self::C1).recip()
   }
 }
