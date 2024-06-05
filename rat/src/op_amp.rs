@@ -5,6 +5,9 @@ use bilinear_transform::BilinearTransform;
 use op_amp_correction::OpAmpCorrection;
 use third_order_iir_filter::ThirdOrderIIRFilter;
 
+const R1: f32 = 100000.;
+const C1: f32 = 1e-10;
+
 pub struct OpAmp {
   op_amp: ThirdOrderIIRFilter,
   bilinear_transform: BilinearTransform,
@@ -12,8 +15,10 @@ pub struct OpAmp {
 }
 
 impl OpAmp {
-  const R1: f32 = 100000.;
-  const C1: f32 = 1e-10;
+  const Z1_B0: f32 = 2.72149e-7;
+  const Z1_B1: f32 = 0.0027354;
+  const Z1_A0: f32 = 6.27638e-9;
+  const Z1_A1: f32 = 0.0000069;
 
   pub fn new(sample_rate: f32) -> Self {
     Self {
@@ -33,20 +38,15 @@ impl OpAmp {
   }
 
   fn get_s_domain_coefficients(&self, distortion: f32) -> ([f32; 4], [f32; 4]) {
-    let z2_b0 = (distortion * Self::R1).max(1.);
-    let z2_a0 = z2_b0 * Self::C1;
+    let z2_b0 = (distortion * R1).max(1.);
+    let z2_a0 = z2_b0 * C1;
 
-    let z1_b0 = 2.72149e-7;
-    let z1_b1 = 0.0027354;
-    let z1_a0 = 6.27638e-9;
-    let z1_a1 = 0.0000069;
-
-    let a0 = z1_b0 * z2_a0;
-    let a1 = z1_b0 + z1_b1 * z2_a0;
-    let a2 = z1_b1 + z2_a0;
+    let a0 = Self::Z1_B0 * z2_a0;
+    let a1 = Self::Z1_B0 + Self::Z1_B1 * z2_a0;
+    let a2 = Self::Z1_B1 + z2_a0;
     let b0 = a0;
-    let b1 = a1 + z1_a0 * z2_b0;
-    let b2 = z1_a1 * z2_b0 + z1_b1 + z2_a0;
+    let b1 = a1 + Self::Z1_A0 * z2_b0;
+    let b2 = Self::Z1_A1 * z2_b0 + Self::Z1_B1 + z2_a0;
 
     ([b0, b1, b2, 1.], [a0, a1, a2, 1.])
   }

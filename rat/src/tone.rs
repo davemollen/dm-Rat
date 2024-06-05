@@ -1,15 +1,15 @@
 use crate::shared::one_pole_filter::OnePoleFilter;
 use std::f32::consts::TAU;
 
+const R1: f32 = 100000.;
+const R2: f32 = 1500.;
+const C1: f32 = 3.3e-9;
+
 pub struct Tone {
   lowpass: OnePoleFilter,
 }
 
 impl Tone {
-  const R1: f32 = 100000.;
-  const R2: f32 = 1500.;
-  const C1: f32 = 3.3e-9;
-
   pub fn new(sample_rate: f32) -> Self {
     Self {
       lowpass: OnePoleFilter::new(sample_rate),
@@ -22,7 +22,7 @@ impl Tone {
   }
 
   fn get_cutoff_frequency(&self, tone: f32) -> f32 {
-    let resistor = tone * Self::R1 + Self::R2;
-    (TAU * resistor * Self::C1).recip()
+    let resistor = tone * R1 + R2;
+    (TAU * resistor * C1).recip()
   }
 }
