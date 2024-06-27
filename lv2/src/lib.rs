@@ -40,9 +40,9 @@ impl Plugin for DmRat {
     let distortion = *ports.distortion;
     let filter = *ports.filter;
     let volume = *ports.volume;
-    let distortion = distortion * distortion;
-    let filter = filter * filter;
-    let volume = volume * volume;
+    let distortion = distortion * distortion * distortion;
+    let filter = filter * filter * filter;
+    let volume = volume * volume * volume;
 
     if !self.is_active {
       self.rat.initialize_params(distortion, filter, volume);
