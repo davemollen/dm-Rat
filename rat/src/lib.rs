@@ -1,4 +1,3 @@
-#![feature(portable_simd)]
 mod op_amp;
 use op_amp::OpAmp;
 mod tone;
