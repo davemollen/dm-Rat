@@ -1,10 +1,11 @@
 mod coefficients;
 mod fir_filter;
-mod lookup_table;
 mod slew_coefficients;
 use {
-  coefficients::Coefficients, fir_filter::FirFilter, lookup_table::DIODE_TABLE,
+  coefficients::Coefficients,
+  fir_filter::FirFilter,
   slew_coefficients::SlewCoefficients,
+  std::simd::{f32x8, num::SimdFloat, StdFloat},
 };
 
 const OVERSAMPLE_FACTOR: f32 = 8.;
@@ -15,9 +16,6 @@ pub struct Clipper {
 }
 
 impl Clipper {
-  const SIZE: usize = DIODE_TABLE.len() - 1;
-  const HALF_SIZE: f32 = DIODE_TABLE.len() as f32 * 0.5;
-
   pub fn new() -> Self {
     Self {
       upsample_fir: FirFilter::new(Coefficients::new()),
@@ -26,19 +24,18 @@ impl Clipper {
   }
 
   pub fn process(&mut self, input: f32) -> f32 {
-    let upsampled = self.upsample_fir.process([input * OVERSAMPLE_FACTOR; 8]);
-    let clipped = upsampled.map(|x| Self::simulate_diode_clipping(x));
-    self.downsample_fir.process(clipped).into_iter().sum()
+    let upsampled = self
+      .upsample_fir
+      .process(f32x8::splat(input * OVERSAMPLE_FACTOR));
+    let clipped = Self::clip(upsampled);
+    self.downsample_fir.process(clipped).reduce_sum() * 0.32374 // 0.64748 * 0.5
   }
 
-  fn simulate_diode_clipping(x: f32) -> f32 {
-    let x = (x * 0.25) * Self::HALF_SIZE + Self::HALF_SIZE;
-    let index = x.trunc();
-    let frac = x - index;
-    let i = index as usize;
-
-    (DIODE_TABLE[i.clamp(0, Self::SIZE)] * (1. - frac)
-      + DIODE_TABLE[(i + 1).clamp(0, Self::SIZE)] * frac)
-      * 0.5
+  fn clip(x: f32x8) -> f32x8 {
+    let x2 = x * x;
+    let x3 = x2 * x;
+    let x5 = x3 * x2;
+    let a = x + f32x8::splat(0.16489087) * x3 + f32x8::splat(0.00985468) * x5;
+    a / (f32x8::splat(1.0) + a * a).sqrt()
   }
 }
