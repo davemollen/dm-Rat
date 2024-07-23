@@ -17,9 +17,9 @@ impl DmRat {
     let volume = self.params.volume.value();
 
     (
-      distortion * distortion * distortion,
-      filter * filter * filter,
-      volume * volume * volume,
+      distortion * distortion,
+      filter * filter,
+      volume * volume,
     )
   }
 }
