@@ -37,9 +37,9 @@ impl Plugin for DmRat {
   // Process a chunk of audio. The audio ports are dereferenced to slices, which the plugin
   // iterates over.
   fn run(&mut self, ports: &mut Ports, _features: &mut (), _sample_count: u32) {
-    let distortion = *ports.distortion * *ports.distortion;
-    let filter = *ports.filter * *ports.filter;
-    let volume = *ports.volume * *ports.volume;
+    let distortion = *ports.distortion * *ports.distortion * *ports.distortion;
+    let filter = *ports.filter * *ports.filter * *ports.filter;
+    let volume = *ports.volume * *ports.volume * *ports.volume;
 
     if !self.is_active {
       self.rat.initialize_params(distortion, filter, volume);
