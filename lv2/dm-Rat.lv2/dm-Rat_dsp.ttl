@@ -17,7 +17,9 @@
 	mod:brand "DM" ;
 	mod:label "Rat" ;
 	rdfs:comment """
-A distortion effect written in Rust.
+A distortion effect modeled after the ProCo Rat(*).
+
+(*) 'ProCo Rat is a trademark or trade name of another manufacturer and was used merely to identify the product whose sound was reviewed in the creation of this product. All other trademarks are the property of their respective holders.'
 """ ;
 	lv2:requiredFeature lv2:inPlaceBroken ;
 	lv2:optionalFeature lv2:hardRTCapable ;
