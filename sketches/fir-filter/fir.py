@@ -4,14 +4,10 @@ from numpy import pi, absolute, array, array_split, ceil
 from scipy.signal import minimum_phase, firwin, freqz, kaiser_beta
 from pylab import figure, clf, plot, xlabel, ylabel, ylim, title, grid, show
 
-#------------------------------------------------
-# Create a FIR filter and apply it to x.
-#------------------------------------------------
-
 # Oversampling factor should be a number that's a power of two
 oversampling = 8
 base_length = 32
-base_sample_rate = 44100.0
+base_sample_rate = 48000.0
 
 N = base_length * oversampling - 1
 sample_rate = base_sample_rate * oversampling
@@ -29,7 +25,8 @@ ripple_db = 90.0
 beta = kaiser_beta(ripple_db)
 
 # The cutoff frequency of the filter.
-cutoff_hz = 20727.
+# cutoff_hz = 5300.
+cutoff_hz = base_sample_rate * 0.47
 
 # Use firwin with a Kaiser window to create a lowpass FIR filter.
 taps = firwin(N, cutoff_hz/nyq_rate, window=('kaiser', beta))
@@ -61,7 +58,7 @@ grid(True)
 
 figure(2)
 clf()
-w, h = freqz(taps, worN=4096)
+w, h = freqz(taps_min_phase, worN=4096)
 plot((w/pi)*nyq_rate, absolute(h), linewidth=2)
 xlabel('Frequency (Hz)')
 ylabel('Gain')
