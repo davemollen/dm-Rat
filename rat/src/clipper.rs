@@ -14,9 +14,9 @@ pub struct Clipper {
 }
 
 impl Clipper {
-  pub fn new() -> Self {
+  pub fn new(sample_rate: f32) -> Self {
     Self {
-      upsample_fir: FirFilter::new(SlewCoefficients::new()),
+      upsample_fir: FirFilter::new(SlewCoefficients::new(sample_rate)),
       downsample_fir: FirFilter::new(Coefficients::new()),
     }
   }

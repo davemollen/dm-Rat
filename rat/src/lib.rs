@@ -23,7 +23,7 @@ impl Rat {
   pub fn new(sample_rate: f32) -> Self {
     Self {
       op_amp: OpAmp::new(sample_rate),
-      clipper: Clipper::new(),
+      clipper: Clipper::new(sample_rate),
       tone: Tone::new(sample_rate),
       smooth_parameters: SmoothParameters::new(sample_rate),
     }
