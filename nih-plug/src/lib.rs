@@ -1,5 +1,5 @@
 use nih_plug::prelude::*;
-use rat::Rat;
+use rat::{Params as ProcessParams, Rat};
 use std::sync::Arc;
 mod rat_parameters;
 use rat_parameters::RatParameters;
@@ -8,20 +8,7 @@ mod editor;
 struct DmRat {
   params: Arc<RatParameters>,
   rat: Rat,
-}
-
-impl DmRat {
-  fn get_params(&self) -> (f32, f32, f32) {
-    let distortion = self.params.distortion.value();
-    let filter = self.params.filter.value();
-    let volume = self.params.volume.value();
-
-    (
-      distortion * distortion * distortion,
-      filter * filter * filter,
-      volume * volume * volume,
-    )
-  }
+  process_params: ProcessParams,
 }
 
 impl Default for DmRat {
@@ -30,6 +17,7 @@ impl Default for DmRat {
     Self {
       params: params.clone(),
       rat: Rat::new(44100.),
+      process_params: ProcessParams::new(44100.),
     }
   }
 }
@@ -70,8 +58,7 @@ impl Plugin for DmRat {
     _context: &mut impl InitContext<Self>,
   ) -> bool {
     self.rat = Rat::new(buffer_config.sample_rate);
-    let (distortion, filter, volume) = self.get_params();
-    self.rat.initialize_params(distortion, filter, volume);
+    self.process_params = ProcessParams::new(buffer_config.sample_rate);
     true
   }
 
@@ -81,12 +68,15 @@ impl Plugin for DmRat {
     _aux: &mut AuxiliaryBuffers,
     _context: &mut impl ProcessContext<Self>,
   ) -> ProcessStatus {
-    let (distortion, filter, volume) = self.get_params();
+    self.process_params.set(
+      self.params.distortion.value(),
+      self.params.filter.value(),
+      self.params.volume.value(),
+    );
 
     buffer.iter_samples().for_each(|mut channel_samples| {
       let sample = channel_samples.iter_mut().next().unwrap();
-      let rat_output = self.rat.process(*sample, distortion, filter, volume);
-      *sample = rat_output;
+      *sample = self.rat.process(*sample, &mut self.process_params);
     });
     ProcessStatus::Normal
   }

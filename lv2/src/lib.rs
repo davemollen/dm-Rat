@@ -1,7 +1,7 @@
 extern crate lv2;
 extern crate rat;
 use lv2::prelude::*;
-use rat::Rat;
+use rat::{Params, Rat};
 
 #[derive(PortCollection)]
 struct Ports {
@@ -15,7 +15,7 @@ struct Ports {
 #[uri("https://github.com/davemollen/dm-Rat")]
 struct DmRat {
   rat: Rat,
-  is_active: bool,
+  params: Params,
 }
 
 impl Plugin for DmRat {
@@ -27,27 +27,24 @@ impl Plugin for DmRat {
   type AudioFeatures = ();
 
   // Create a new instance of the plugin; Trivial in this case.
-  fn new(_plugin_info: &PluginInfo, _features: &mut ()) -> Option<Self> {
+  fn new(plugin_info: &PluginInfo, _features: &mut ()) -> Option<Self> {
+    let sample_rate = plugin_info.sample_rate() as f32;
+
     Some(Self {
-      rat: Rat::new(_plugin_info.sample_rate() as f32),
-      is_active: false,
+      rat: Rat::new(sample_rate),
+      params: Params::new(sample_rate),
     })
   }
 
   // Process a chunk of audio. The audio ports are dereferenced to slices, which the plugin
   // iterates over.
   fn run(&mut self, ports: &mut Ports, _features: &mut (), _sample_count: u32) {
-    let distortion = *ports.distortion * *ports.distortion * *ports.distortion;
-    let filter = *ports.filter * *ports.filter * *ports.filter;
-    let volume = *ports.volume * *ports.volume * *ports.volume;
-
-    if !self.is_active {
-      self.rat.initialize_params(distortion, filter, volume);
-      self.is_active = true;
-    }
+    self
+      .params
+      .set(*ports.distortion, *ports.filter, *ports.volume);
 
     for (input, output) in ports.input.iter().zip(ports.output.iter_mut()) {
-      *output = self.rat.process(*input, distortion, filter, volume);
+      *output = self.rat.process(*input, &mut self.params);
     }
   }
 }
