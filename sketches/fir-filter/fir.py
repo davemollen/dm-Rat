@@ -5,7 +5,7 @@ from scipy.signal import minimum_phase, firwin, freqz, kaiser_beta
 from pylab import figure, clf, plot, xlabel, ylabel, ylim, title, grid, show
 
 # Oversampling factor should be a number that's a power of two
-oversampling = 8
+oversampling = 2
 base_length = 32
 base_sample_rate = 48000.0
 
