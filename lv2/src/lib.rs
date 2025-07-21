@@ -5,11 +5,11 @@ use rat::{Params, Rat};
 
 #[derive(PortCollection)]
 struct Ports {
-  distortion: InputPort<Control>,
-  filter: InputPort<Control>,
-  volume: InputPort<Control>,
-  input: InputPort<Audio>,
-  output: OutputPort<Audio>,
+  distortion: InputPort<InPlaceControl>,
+  filter: InputPort<InPlaceControl>,
+  volume: InputPort<InPlaceControl>,
+  input: InputPort<InPlaceAudio>,
+  output: OutputPort<InPlaceAudio>,
 }
 
 #[uri("https://github.com/davemollen/dm-Rat")]
@@ -39,12 +39,15 @@ impl Plugin for DmRat {
   // Process a chunk of audio. The audio ports are dereferenced to slices, which the plugin
   // iterates over.
   fn run(&mut self, ports: &mut Ports, _features: &mut (), _sample_count: u32) {
-    self
-      .params
-      .set(*ports.distortion, *ports.filter, *ports.volume);
+    self.params.set(
+      ports.distortion.get(),
+      ports.filter.get(),
+      ports.volume.get(),
+    );
 
-    for (input, output) in ports.input.iter().zip(ports.output.iter_mut()) {
-      *output = self.rat.process(*input, &mut self.params);
+    for (input, output) in ports.input.iter().zip(ports.output.iter()) {
+      let rat_output = self.rat.process(input.get(), &mut self.params);
+      output.set(rat_output);
     }
   }
 }
