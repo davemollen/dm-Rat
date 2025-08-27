@@ -7,6 +7,7 @@ pub struct FirFilter {
   coefficients: Vec<f32x8>,
   index: usize,
   mask: usize,
+  prev_input: f32x8,
 }
 
 impl FirFilter {
@@ -19,6 +20,7 @@ impl FirFilter {
       coefficients,
       index: 0,
       mask: length - 1,
+      prev_input: f32x8::splat(0.),
     }
   }
 
@@ -30,7 +32,7 @@ impl FirFilter {
   }
 
   pub fn downsample(&mut self, input: f32x8) -> f32 {
-    self.write(input);
+    self.write_for_downsample(input);
     (0..self.buffer.len())
       .map(|i| {
         self.buffer[(self.index + self.buffer.len() - i) & self.mask].reverse()
@@ -43,6 +45,12 @@ impl FirFilter {
   fn write(&mut self, input: f32x8) {
     self.index = self.index + 1 & self.mask;
     self.buffer[self.index] = input;
+  }
+
+  fn write_for_downsample(&mut self, input: f32x8) {
+    self.index = self.index + 1 & self.mask;
+    self.buffer[self.index] = self.prev_input.shift_elements_left::<1>(input[0]);
+    self.prev_input = input;
   }
 }
 
@@ -1130,7 +1138,7 @@ mod tests {
   #[test]
   fn should_downsample() {
     let input = [
-      // 0.00000000e+00,
+      0.00000000e+00,
       -1.30526192e-01,
       2.58819045e-01,
       -3.82683432e-01,
@@ -1228,6 +1236,7 @@ mod tests {
       1.30526192e-01,
     ];
     let expected_output = [
+      0.00000000e+00,
       -1.98802801e-03,
       -2.83260240e-03,
       1.48075988e-03,
