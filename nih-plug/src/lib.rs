@@ -23,7 +23,7 @@ impl Default for DmRat {
 }
 
 impl Plugin for DmRat {
-  const NAME: &'static str = "dm-Rat";
+  const NAME: &'static str = "Rat";
   const VENDOR: &'static str = "DM";
   const URL: &'static str = "https://github.com/davemollen/dm-Rat";
   const EMAIL: &'static str = "davemollen@gmail.com";
