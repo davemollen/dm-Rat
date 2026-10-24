@@ -1,6 +1,5 @@
 mod smooth;
-use smooth::LinearSmooth;
-pub use smooth::Smoother;
+pub use smooth::{LinearSmooth, Smoother};
 
 pub struct Params {
   pub distortion: LinearSmooth,

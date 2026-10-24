@@ -1,7 +1,7 @@
 extern crate lv2;
 extern crate rat;
 use lv2::prelude::*;
-use rat::{Params, Rat};
+use rat::{Bypass, Params, Rat};
 
 #[derive(PortCollection)]
 struct Ports {
@@ -10,12 +10,14 @@ struct Ports {
   volume: InputPort<InPlaceControl>,
   input: InputPort<InPlaceAudio>,
   output: OutputPort<InPlaceAudio>,
+  enabled: InputPort<InPlaceControl>,
 }
 
 #[uri("https://github.com/davemollen/dm-Rat")]
 struct DmRat {
   rat: Rat,
   params: Params,
+  bypass: Bypass,
 }
 
 impl Plugin for DmRat {
@@ -33,6 +35,7 @@ impl Plugin for DmRat {
     Some(Self {
       rat: Rat::new(sample_rate),
       params: Params::new(sample_rate),
+      bypass: Bypass::new(sample_rate),
     })
   }
 
@@ -40,11 +43,16 @@ impl Plugin for DmRat {
   fn activate(&mut self, _features: &mut Self::InitFeatures) {
     self.rat.reset();
     self.params.reset();
+    self.bypass.reset();
   }
 
   // Process a chunk of audio. The audio ports are dereferenced to slices, which the plugin
   // iterates over.
   fn run(&mut self, ports: &mut Ports, _features: &mut (), _sample_count: u32) {
+    self.bypass.set_enabled(ports.enabled.get() == 0., || {
+      self.rat.reset();
+      self.params.reset();
+    });
     self.params.set(
       ports.distortion.get(),
       ports.filter.get(),
@@ -52,7 +60,13 @@ impl Plugin for DmRat {
     );
 
     for (input, output) in ports.input.iter().zip(ports.output.iter()) {
-      let rat_output = self.rat.process(input.get(), &mut self.params);
+      let dry = input.get();
+      let rat_output = if self.bypass.is_enabled() {
+        dry
+      } else {
+        let wet = self.rat.process(dry, &mut self.params);
+        self.bypass.process(dry, wet)
+      };
       output.set(rat_output);
     }
   }

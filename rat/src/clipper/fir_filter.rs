@@ -23,9 +23,7 @@ impl FirFilter {
   }
 
   pub fn reset(&mut self) {
-    for value in self.buffer.iter_mut() {
-      *value = f32x8::splat(0.);
-    }
+    self.buffer.fill(f32x8::splat(0.));
   }
 
   pub fn upsample(&mut self, input: f32) -> f32x8 {

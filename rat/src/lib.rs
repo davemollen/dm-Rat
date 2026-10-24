@@ -1,4 +1,5 @@
 #![feature(portable_simd)]
+mod bypass;
 mod clipper;
 mod op_amp;
 mod params;
@@ -7,7 +8,7 @@ mod shared {
   pub mod float_ext;
   pub mod one_pole_filter;
 }
-pub use params::Params;
+pub use {bypass::Bypass, params::Params};
 use {clipper::Clipper, op_amp::OpAmp, params::Smoother, tone::Tone};
 
 pub struct Rat {
