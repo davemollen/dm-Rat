@@ -16,6 +16,10 @@ impl Tone {
     }
   }
 
+  pub fn reset(&mut self) {
+    self.lowpass.reset();
+  }
+
   pub fn process(&mut self, input: f32, tone: f32) -> f32 {
     let cutoff_freq = self.get_cutoff_frequency(tone);
     self.lowpass.process(input, cutoff_freq)

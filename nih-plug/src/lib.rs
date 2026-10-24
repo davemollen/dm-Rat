@@ -69,6 +69,11 @@ impl Plugin for DmRat {
     true
   }
 
+  fn reset(&mut self) {
+    self.rat.reset();
+    self.process_params.reset();
+  }
+
   fn process(
     &mut self,
     buffer: &mut Buffer,

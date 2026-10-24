@@ -28,6 +28,11 @@ impl OpAmp {
     }
   }
 
+  pub fn reset(&mut self) {
+    self.op_amp.reset();
+    self.op_amp_correction.reset();
+  }
+
   pub fn process(&mut self, input: f32, distortion: f32) -> f32 {
     let s_domain_coefficients = self.get_s_domain_coefficients(distortion);
     let z_domain_coefficients = self.bilinear_transform.process(s_domain_coefficients);

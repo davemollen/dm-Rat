@@ -15,13 +15,17 @@ impl OpAmpCorrection {
     }
   }
 
-  fn get_cutoff_frequency(&self, distortion: f32) -> f32 {
-    let gain = distortion * (MAX_DISTORTION_GAIN - MIN_DISTORTION_GAIN) + MIN_DISTORTION_GAIN;
-    MAX_GAIN_AT_ONE_HZ / gain
+  pub fn reset(&mut self) {
+    self.filter.reset();
   }
 
   pub fn process(&mut self, input: f32, distortion: f32) -> f32 {
     let cutoff_frequency = self.get_cutoff_frequency(distortion);
     self.filter.process(input, cutoff_frequency)
+  }
+
+  fn get_cutoff_frequency(&self, distortion: f32) -> f32 {
+    let gain = distortion * (MAX_DISTORTION_GAIN - MIN_DISTORTION_GAIN) + MIN_DISTORTION_GAIN;
+    MAX_GAIN_AT_ONE_HZ / gain
   }
 }

@@ -19,6 +19,10 @@ impl Params {
     }
   }
 
+  pub fn reset(&mut self) {
+    self.is_initialized = false;
+  }
+
   pub fn set(&mut self, distortion: f32, filter: f32, volume: f32) {
     let distortion = distortion * distortion * distortion;
     let filter = filter * filter * filter;

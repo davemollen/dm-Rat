@@ -4,7 +4,11 @@ pub struct ThirdOrderIIRFilter {
 
 impl ThirdOrderIIRFilter {
   pub fn new() -> Self {
-    Self { z: [0.0; 3] }
+    Self { z: [0.; 3] }
+  }
+
+  pub fn reset(&mut self) {
+    self.z = [0.; 3];
   }
 
   pub fn process(&mut self, x: f32, (b, a): ([f32; 4], [f32; 4])) -> f32 {

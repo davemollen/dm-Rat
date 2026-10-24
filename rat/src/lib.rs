@@ -25,6 +25,12 @@ impl Rat {
     }
   }
 
+  pub fn reset(&mut self) {
+    self.op_amp.reset();
+    self.clipper.reset();
+    self.tone.reset();
+  }
+
   pub fn process(&mut self, input: f32, params: &mut Params) -> f32 {
     let distortion = params.distortion.next();
     let filter = params.filter.next();
