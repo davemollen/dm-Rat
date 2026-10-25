@@ -30,7 +30,7 @@ impl Bypass {
     self.prev_enabled = enabled;
   }
 
-  pub fn is_enabled(&self) -> bool {
+  pub fn is_done_activating(&self) -> bool {
     self.mix_factor.target == 0. && self.mix_factor.current == 0.
   }
 

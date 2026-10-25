@@ -48,11 +48,17 @@ impl Plugin for DmRat {
 
   // Process a chunk of audio. The audio ports are dereferenced to slices, which the plugin
   // iterates over.
-  fn run(&mut self, ports: &mut Ports, _features: &mut (), _sample_count: u32) {
+  fn run(&mut self, ports: &mut Ports, _features: &mut (), sample_count: u32) {
     self.bypass.set_enabled(ports.enabled.get() == 0., || {
       self.rat.reset();
       self.params.reset();
     });
+
+    if self.bypass.is_done_activating() {
+      ports.output.copy_from(&ports.input, sample_count);
+      return;
+    }
+
     self.params.set(
       ports.distortion.get(),
       ports.filter.get(),
@@ -61,12 +67,8 @@ impl Plugin for DmRat {
 
     for (input, output) in ports.input.iter().zip(ports.output.iter()) {
       let dry = input.get();
-      let rat_output = if self.bypass.is_enabled() {
-        dry
-      } else {
-        let wet = self.rat.process(dry, &mut self.params);
-        self.bypass.process(dry, wet)
-      };
+      let wet = self.rat.process(dry, &mut self.params);
+      let rat_output = self.bypass.process(dry, wet);
       output.set(rat_output);
     }
   }
