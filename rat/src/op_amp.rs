@@ -12,6 +12,8 @@ pub struct OpAmp {
   op_amp: ThirdOrderIIRFilter,
   bilinear_transform: BilinearTransform,
   op_amp_correction: OpAmpCorrection,
+  prev_distortion: Option<f32>,
+  z_domain_coefficients: ([f32; 4], [f32; 4]),
 }
 
 impl OpAmp {
@@ -25,6 +27,8 @@ impl OpAmp {
       op_amp: ThirdOrderIIRFilter::new(),
       bilinear_transform: BilinearTransform::new(sample_rate),
       op_amp_correction: OpAmpCorrection::new(sample_rate),
+      prev_distortion: None,
+      z_domain_coefficients: ([0.; 4], [0.; 4]),
     }
   }
 
@@ -34,12 +38,17 @@ impl OpAmp {
   }
 
   pub fn process(&mut self, input: f32, distortion: f32) -> f32 {
-    let s_domain_coefficients = self.get_s_domain_coefficients(distortion);
-    let z_domain_coefficients = self.bilinear_transform.process(s_domain_coefficients);
-    let ideal_op_amp_output = self.op_amp.process(input, z_domain_coefficients);
-    self
-      .op_amp_correction
-      .process(ideal_op_amp_output, distortion)
+    if self
+      .prev_distortion
+      .map_or(true, |value| value != distortion)
+    {
+      let s_domain_coefficients = self.get_s_domain_coefficients(distortion);
+      self.z_domain_coefficients = self.bilinear_transform.process(s_domain_coefficients);
+      self.op_amp_correction.set_cutoff_frequency(distortion);
+      self.prev_distortion = Some(distortion);
+    }
+    let ideal_op_amp_output = self.op_amp.process(input, self.z_domain_coefficients);
+    self.op_amp_correction.process(ideal_op_amp_output)
   }
 
   fn get_s_domain_coefficients(&self, distortion: f32) -> ([f32; 4], [f32; 4]) {

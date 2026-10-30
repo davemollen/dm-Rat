@@ -6,12 +6,14 @@ const MAX_DISTORTION_GAIN: f32 = 2307.231003; // max distortion gain = 67.261822
 
 pub struct OpAmpCorrection {
   filter: OnePoleFilter,
+  freq: f32,
 }
 
 impl OpAmpCorrection {
   pub fn new(sample_rate: f32) -> Self {
     Self {
       filter: OnePoleFilter::new(sample_rate),
+      freq: 0.,
     }
   }
 
@@ -19,13 +21,12 @@ impl OpAmpCorrection {
     self.filter.reset();
   }
 
-  pub fn process(&mut self, input: f32, distortion: f32) -> f32 {
-    let cutoff_frequency = self.get_cutoff_frequency(distortion);
-    self.filter.process(input, cutoff_frequency)
+  pub fn process(&mut self, input: f32) -> f32 {
+    self.filter.process(input, self.freq)
   }
 
-  fn get_cutoff_frequency(&self, distortion: f32) -> f32 {
+  pub fn set_cutoff_frequency(&mut self, distortion: f32) {
     let gain = distortion * (MAX_DISTORTION_GAIN - MIN_DISTORTION_GAIN) + MIN_DISTORTION_GAIN;
-    MAX_GAIN_AT_ONE_HZ / gain
+    self.freq = MAX_GAIN_AT_ONE_HZ / gain;
   }
 }
